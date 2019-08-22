@@ -62,13 +62,13 @@ spec:
         - name: build-app
           taskRef:
             name: task-clone-source
+          params:
+              - name: APP_DIR
+                value: $(params.APP_DIR)
           resources:
             inputs:
                 - name: git-repo
                   resource: app-git-repo
-          params:
-              - name: APP_DIR
-                value: $(params.APP_DIR)
 
 ---
 
@@ -79,13 +79,13 @@ metadata:
 spec:
     pipelineRef:
         name: build-openwhisk-app
+    params:
+        - name: APP_DIR
+          value: "/workspace/git-repo/packages/left-pad/"
     resources:
         - name: app-git-repo
           resourceRef:
             name: app-git 
-    params:
-        - name: APP_DIR
-          value: "/workspace/git-repo/packages/left-pad/"
     
 ---
 
