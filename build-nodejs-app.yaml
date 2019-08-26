@@ -1,4 +1,4 @@
-# Git Pipeline Resource for an application GitHub Repo
+# Git Pipeline Resource representing an application source on GitHub
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
@@ -12,11 +12,46 @@ spec:
     value: https://github.com/apache/openwhisk-test.git
 ---
 
-# Task to clone GitHub repo and display a file contents
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: task-clone-source
+  name: task-install-tools
+spec:
+  inputs:
+    resources:
+    - name: git-repo
+      type: git
+    params:
+    - name: NODE_VERSION
+      default: "node"
+    - name: APP_DIR
+      default: ""
+  outputs:
+    resources:
+    - name: git-repo
+      type: git
+  steps:
+  - name: install-node-packages
+    image: $(inputs.params.NODE_VERSION)
+    command:
+    - bash
+    args:
+    - -c
+    - |
+      cd $(inputs.params.APP_DIR)
+      echo "Starting to install Node Packages under $(inputs.params.APP_DIR)"
+      npm install --production --loglevel=error
+      if [ $? = 0 ]; then
+        echo "Successfully finished installing Node Packages under $(inputs.params.APP_DIR)"
+      else
+        echo "Failed to install Node Packages under $(inputs.params.APP_DIR)"
+      fi
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: task-build-archive
 spec:
   inputs:
     resources:
@@ -32,17 +67,21 @@ spec:
     - name: ACTION_ARCHIVE_NAME
       default: "action.zip"
   steps:
-  - name: install-node
+  - name: build-action-archive
     image: $(inputs.params.NODE_VERSION)
     command:
     - bash
     args:
     - -c
     - |
-      npm install --prefix $(inputs.params.APP_DIR)
       apt-get update && apt-get install $(inputs.params.ARCHIVE_UTILITY)
       cd $(inputs.params.APP_DIR) && $(inputs.params.ARCHIVE_UTILITY) $(inputs.params.ACTION_ARCHIVE_NAME) -r *
-        base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'
+      if [ $? = 0 ]; then
+        echo "Successfully built and created $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.APP_DIR)"
+      else
+        echo "Failed to build and archive action source into $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.APP_DIR)"
+      fi
+      #        base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'
 ---
 
 # Pipeline
@@ -59,9 +98,22 @@ spec:
   - name: app-git-repo
     type: git
   tasks:
-  - name: build-app
+  - name: install-tools
     taskRef:
-      name: task-clone-source
+      name: task-install-tools
+    params:
+    - name: APP_DIR
+      value: $(params.APP_DIR)
+    resources:
+      inputs:
+      - name: git-repo
+        resource: app-git-repo
+      outputs:
+      - name: git-repo
+        resource: app-git-repo
+  - name: build-archive
+    taskRef:
+      name: task-build-archive
     params:
     - name: APP_DIR
       value: $(params.APP_DIR)
