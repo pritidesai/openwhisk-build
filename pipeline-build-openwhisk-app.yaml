@@ -37,9 +37,14 @@ spec:
   tasks:
     #####################################################################
     # Task to Clone Application Source and Install necessary Dependencies
-    - name: install-deps
+    - name: install-npm-packages
       taskRef:
-        name: task-install-deps
+        name: task-install-npm-packages
+      conditions:
+        - conditionRef: is-nodejs-runtime
+          params:
+            - name: APP_PATH
+              value: $(params.APP_PATH)
       resources:
         inputs:
           - name: app-git
@@ -57,6 +62,11 @@ spec:
     - name: build-archive
       taskRef:
         name: task-build-archive
+      conditions:
+        - conditionRef: is-nodejs-runtime
+          params:
+            - name: APP_PATH
+              value: $(params.APP_PATH)
       resources:
         inputs:
           - name: app-git
