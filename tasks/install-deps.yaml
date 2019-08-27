@@ -15,7 +15,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: task-install-deps
+  name: task-install-npm-packages
 spec:
   inputs:
     resources:
