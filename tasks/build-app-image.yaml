@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: build-app-image
+spec:
+  pipelineRef:
+    name: build-openwhisk-app
+  params:
+    - name: APP_PATH
+      value: "/workspace/git-repo/packages/left-pad/"
+    - name: DOCKERFILE
+      value: "./runtime-git/core/nodejs10Action/knative/Dockerfile"
+    - name: OW_ACTION_NAME
+      value: "openwhisk-padding-app"
+  resources:
+    - name: app-git
+      resourceRef:
+        name: padding-app-git
+    - name: runtime-git
+      resourceRef:
+        name: nodejs-runtime-git
+    - name: app-image
+      resourceRef:
+        name: openwhisk-padding-app
