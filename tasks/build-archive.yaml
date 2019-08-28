@@ -5,7 +5,7 @@
 #   * OW_APP_NODE_VERSION: any specific Node version, e.g. "node:10.16", or "node:10.16-stretch", etc default is "node"
 #       Any supported Node tags are allowed from https://hub.docker.com/_/node/
 #   * OW_APP_PATH: path to the application source within GitHub repo
-#   * ACTION_ARCHIVE_NAME: default is action.zip
+#   * OW_ACTION_ARCHIVE_NAME: default is action.zip
 #
 # This task creates archive with everything from the application path
 #
@@ -23,7 +23,7 @@ spec:
         default: "node"
       - name: OW_APP_PATH
         default: ""
-      - name: ACTION_ARCHIVE_NAME
+      - name: OW_ACTION_ARCHIVE_NAME
         default: "action.zip"
   steps:
     - name: build-action-archive
@@ -34,9 +34,9 @@ spec:
         - -c
         - |
           apt-get update && apt-get install zip
-          cd $(inputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH) && zip $(inputs.params.ACTION_ARCHIVE_NAME) -r *
+          cd $(inputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH) && zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
           if [ $? = 0 ]; then
-            echo "Successfully built and created $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+            echo "Successfully built and created $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
           else
-            echo "Failed to build and archive action source into $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+            echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
           fi

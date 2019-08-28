@@ -8,7 +8,7 @@ spec:
       type: string
     - name: OW_APP_NODE_VERSION
       type: string
-    - name: ACTION_ARCHIVE_NAME
+    - name: OW_ACTION_ARCHIVE_NAME
       type: string
     - name: DOCKERFILE
     - name: OW_RUNTIME_DEBUG
@@ -79,8 +79,8 @@ spec:
           value: $(params.OW_APP_PATH)
         - name: OW_APP_NODE_VERSION
           value: $(params.OW_APP_NODE_VERSION)
-        - name: ACTION_ARCHIVE_NAME
-          value: $(params.ACTION_ARCHIVE_NAME)
+        - name: OW_ACTION_ARCHIVE_NAME
+          value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
     # Task to build an image with OpenWhisk Runtime and Application Source
     - name: build-openwhisk-app-image

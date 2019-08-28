@@ -65,7 +65,7 @@ spec:
         - -c
         - |
           cd $(inputs.params.OW_APP_PATH)
-          OW_ACTION_CODE=`base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
+          OW_ACTION_CODE=`base64 $(inputs.params.OW_ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
           OW_ACTION_RAW=true
           cd -
           fi
