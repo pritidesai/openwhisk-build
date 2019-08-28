@@ -2,7 +2,7 @@
 #
 # Inputs:
 #   * app-git: GitHub Repo with application source
-#   * NODE_VERSION: any specific Node version, e.g. "node:10.16", or "node:10.16-stretch", etc default is "node"
+#   * OW_APP_NODE_VERSION: any specific Node version, e.g. "node:10.16", or "node:10.16-stretch", etc default is "node"
 #       Any supported Node tags are allowed from https://hub.docker.com/_/node/
 #   * APP_PATH: path to the application source within GitHub repo
 #   * ACTION_ARCHIVE_NAME: default is action.zip
@@ -19,7 +19,7 @@ spec:
       - name: app-git
         type: git
     params:
-      - name: NODE_VERSION
+      - name: OW_APP_NODE_VERSION
         default: "node"
       - name: APP_PATH
         default: ""
@@ -27,7 +27,7 @@ spec:
         default: "action.zip"
   steps:
     - name: build-action-archive
-      image: $(inputs.params.NODE_VERSION)
+      image: $(inputs.params.OW_APP_NODE_VERSION)
       command:
         - bash
       args:

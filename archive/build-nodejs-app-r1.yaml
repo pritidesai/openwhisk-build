@@ -27,7 +27,7 @@ spec:
     - name: git-repo
       type: git
     params:
-    - name: NODE_VERSION
+    - name: OW_APP_NODE_VERSION
       default: "node"
       description: "Any specific Node version needed to compile/run application source on"
     - name: APP_PATH
@@ -39,7 +39,7 @@ spec:
       type: git
  steps:
   - name: install-node-packages
-    image: $(inputs.params.NODE_VERSION)
+    image: $(inputs.params.OW_APP_NODE_VERSION)
     command:
     - bash
     args:
@@ -73,7 +73,7 @@ spec:
     - name: git-repo
       type: git
     params:
-    - name: NODE_VERSION
+    - name: OW_APP_NODE_VERSION
       default: "node"
     - name: APP_PATH
       default: ""
@@ -83,7 +83,7 @@ spec:
       default: "action.zip"
   steps:
   - name: build-action-archive
-    image: $(inputs.params.NODE_VERSION)
+    image: $(inputs.params.OW_APP_NODE_VERSION)
     command:
     - bash
     args:
