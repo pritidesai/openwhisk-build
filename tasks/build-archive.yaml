@@ -25,6 +25,10 @@ spec:
         default: ""
       - name: OW_ACTION_ARCHIVE_NAME
         default: "action.zip"
+  outputs:
+    resources:
+      - name: app-git
+        type: git
   steps:
     - name: build-action-archive
       image: $(inputs.params.OW_APP_NODE_VERSION)
@@ -34,9 +38,14 @@ spec:
         - -c
         - |
           apt-get update && apt-get install zip
-          cd $(inputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH) && zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
-          if [ $? = 0 ]; then
-            echo "Successfully built and created $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+          if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
+            OW_APP_PATH=$(inputs.resources.app-git.path)
           else
-            echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+            OW_APP_PATH=$(inputs.params.OW_APP_PATH)
+          fi
+          cd $OW_APP_PATH && zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
+          if [ $? = 0 ]; then
+            echo "Successfully built and created $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $OW_APP_PATH"
+          else
+            echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $OW_APP_PATH"
           fi

@@ -1,0 +1,55 @@
+# Git Pipeline Resource representing an application source on GitHub
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: app-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/apache/openwhisk-test.git
+---
+
+# Task Run to Clone a GitHub repo and install npm packages
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: taskrun-install-npm-packages
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        resourceRef:
+          name: app-git
+    params:
+      - name: OW_APP_PATH
+        value: "app-git/packages/left-pad/"
+  outputs:
+    resources:
+      - name: app-git
+        resourceRef:
+          name: app-git
+  taskRef:
+    name: task-install-npm-packages
+---
+
+# Task Run to Clone a GitHub repo and install npm packages without specifying APP_PATH
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: taskrun-install-npm-packages-without-path
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        resourceRef:
+          name: app-git
+  outputs:
+    resources:
+      - name: app-git
+        resourceRef:
+          name: app-git
+  taskRef:
+    name: task-install-npm-packages
