@@ -4,7 +4,7 @@ metadata:
   name: build-openwhisk-app
 spec:
   params:
-    - name: APP_PATH
+    - name: OW_APP_PATH
       type: string
     - name: OW_APP_NODE_VERSION
       type: string
@@ -43,8 +43,8 @@ spec:
       conditions:
         - conditionRef: is-nodejs-runtime
           params:
-            - name: APP_PATH
-              value: $(params.APP_PATH)
+            - name: OW_APP_PATH
+              value: $(params.OW_APP_PATH)
       resources:
         inputs:
           - name: app-git
@@ -53,8 +53,8 @@ spec:
           - name: app-git
             resource: app-git
       params:
-        - name: APP_PATH
-          value: $(params.APP_PATH)
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
         - name: OW_APP_NODE_VERSION
           value: $(params.OW_APP_NODE_VERSION)
     #####################################################################
@@ -65,8 +65,8 @@ spec:
       conditions:
         - conditionRef: is-nodejs-runtime
           params:
-            - name: APP_PATH
-              value: $(params.APP_PATH)
+            - name: OW_APP_PATH
+              value: $(params.OW_APP_PATH)
       resources:
         inputs:
           - name: app-git
@@ -75,8 +75,8 @@ spec:
           - name: app-git
             resource: app-git
       params:
-        - name: APP_PATH
-          value: $(params.APP_PATH)
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
         - name: OW_APP_NODE_VERSION
           value: $(params.OW_APP_NODE_VERSION)
         - name: ACTION_ARCHIVE_NAME

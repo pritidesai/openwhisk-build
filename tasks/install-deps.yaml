@@ -3,7 +3,7 @@
 # Inputs:
 #   * app-git: GitHub repo with an Application Source
 #   * OW_APP_NODE_VERSION: any specific Node Version you want to pull, default is "node"
-#   * APP_PATH: path to application directory within the GitHub repo, default is ""
+#   * OW_APP_PATH: path to application directory within the GitHub repo, default is ""
 #
 # OutPuts:
 #   * app-git: GitHub repo with an Application Source along with all the dependencies installed
@@ -25,7 +25,7 @@ spec:
       - name: OW_APP_NODE_VERSION
         default: "node"
         description: "Any specific Node version needed to compile/run application source on"
-      - name: APP_PATH
+      - name: OW_APP_PATH
         default: ""
         description: "Relative or Absolute path to the application source"
   outputs:
@@ -40,11 +40,11 @@ spec:
       args:
         - -c
         - |
-          cd $(inputs.resources.app-git.path)/$(inputs.params.APP_PATH)
-          echo "Starting to install Node Packages under $(inputs.params.APP_PATH)"
+          cd $(inputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH)
+          echo "Starting to install Node Packages under $(inputs.params.OW_APP_PATH)"
           npm install --production --loglevel=error
           if [ $? = 0 ]; then
-            echo "Successfully finished installing Node Packages under $(inputs.params.APP_PATH)"
+            echo "Successfully finished installing Node Packages under $(inputs.params.OW_APP_PATH)"
           else
-            echo "Failed to install Node Packages under $(inputs.params.APP_PATH)"
+            echo "Failed to install Node Packages under $(inputs.params.OW_APP_PATH)"
           fi
