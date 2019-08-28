@@ -3,22 +3,32 @@ kind: PipelineRun
 metadata:
   name: build-app-image
 spec:
+  serviceAccount: ${SERVICE_ACCOUNT}
   pipelineRef:
     name: build-openwhisk-app
   params:
     - name: OW_APP_PATH
-      value: "/workspace/git-repo/packages/left-pad/"
+      value: "app-git/packages/left-pad/"
     - name: DOCKERFILE
       value: "./runtime-git/core/nodejs10Action/knative/Dockerfile"
     - name: OW_ACTION_NAME
       value: "openwhisk-padding-app"
   resources:
     - name: app-git
-      resourceRef:
-        name: padding-app-git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-test.git
     - name: runtime-git
-      resourceRef:
-        name: nodejs-runtime-git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-runtime-nodejs.git
     - name: app-image
       resourceRef:
-        name: openwhisk-padding-app
+        type: image
+        params:
+          - name: url
+            value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
