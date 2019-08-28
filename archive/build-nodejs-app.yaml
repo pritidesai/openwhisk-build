@@ -15,7 +15,7 @@ spec:
     - name: OW_APP_NODE_VERSION
       default: "node"
       description: "Any specific Node version needed to compile/run application source on"
-    - name: APP_PATH
+    - name: OW_APP_PATH
       default: ""
       description: "Relative or Absolute path to the application source"
   outputs:
@@ -30,13 +30,13 @@ spec:
     args:
     - -c
     - |
-      cd $(inputs.params.APP_PATH)
-      echo "Starting to install Node Packages under $(inputs.params.APP_PATH)"
+      cd $(inputs.params.OW_APP_PATH)
+      echo "Starting to install Node Packages under $(inputs.params.OW_APP_PATH)"
       npm install --production --loglevel=error
       if [ $? = 0 ]; then
-        echo "Successfully finished installing Node Packages under $(inputs.params.APP_PATH)"
+        echo "Successfully finished installing Node Packages under $(inputs.params.OW_APP_PATH)"
       else
-        echo "Failed to install Node Packages under $(inputs.params.APP_PATH)"
+        echo "Failed to install Node Packages under $(inputs.params.OW_APP_PATH)"
       fi
 ---
 
@@ -60,7 +60,7 @@ spec:
     params:
     - name: OW_APP_NODE_VERSION
       default: "node"
-    - name: APP_PATH
+    - name: OW_APP_PATH
       default: ""
     - name: ARCHIVE_UTILITY
       default: "zip"
@@ -75,11 +75,11 @@ spec:
     - -c
     - |
       apt-get update && apt-get install $(inputs.params.ARCHIVE_UTILITY)
-      cd $(inputs.params.APP_PATH) && $(inputs.params.ARCHIVE_UTILITY) $(inputs.params.ACTION_ARCHIVE_NAME) -r *
+      cd $(inputs.params.OW_APP_PATH) && $(inputs.params.ARCHIVE_UTILITY) $(inputs.params.ACTION_ARCHIVE_NAME) -r *
       if [ $? = 0 ]; then
-        echo "Successfully built and created $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.APP_PATH)"
+        echo "Successfully built and created $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
       else
-        echo "Failed to build and archive action source into $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.APP_PATH)"
+        echo "Failed to build and archive action source into $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
       fi
       #        base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'
 ---
@@ -135,7 +135,7 @@ spec:
     args:
     - -c
     - |
-      cd $(inputs.params.APP_PATH)
+      cd $(inputs.params.OW_APP_PATH)
       OW_ACTION_CODE=`base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
       OW_ACTION_RAW=true
       cd -
@@ -197,7 +197,7 @@ metadata:
   name: build-openwhisk-app
 spec:
   params:
-  - name: APP_PATH
+  - name: OW_APP_PATH
     type: string
   resources:
   - name: app-git-repo
@@ -207,8 +207,8 @@ spec:
     taskRef:
       name: task-install-deps
     params:
-    - name: APP_PATH
-      value: $(params.APP_PATH)
+    - name: OW_APP_PATH
+      value: $(params.OW_APP_PATH)
     resources:
       inputs:
       - name: git-repo
@@ -220,8 +220,8 @@ spec:
     taskRef:
       name: task-build-archive
     params:
-    - name: APP_PATH
-      value: $(params.APP_PATH)
+    - name: OW_APP_PATH
+      value: $(params.OW_APP_PATH)
     resources:
       inputs:
       - name: git-repo
@@ -269,7 +269,7 @@ spec:
   pipelineRef:
     name: build-openwhisk-app
   params:
-  - name: APP_PATH
+  - name: OW_APP_PATH
     value: "/workspace/git-repo/packages/left-pad/"
   resources:
   - name: app-git-repo

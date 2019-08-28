@@ -4,7 +4,7 @@ metadata:
   name: is-nodejs-runtime
 spec:
   params:
-    - name: APP_PATH
+    - name: OW_APP_PATH
       type: string
   check:
     image: ubuntu
@@ -13,7 +13,7 @@ spec:
     args:
       - -c
       - |
-        ls $(params.APP_PATH) | grep *.js
+        ls $(params.OW_APP_PATH) | grep *.js
 ---
 
 
@@ -23,7 +23,7 @@ metadata:
   name: is-java-runtime
 spec:
   params:
-    - name: APP_PATH
+    - name: OW_APP_PATH
       type: string
   check:
     image: ubuntu
@@ -32,7 +32,7 @@ spec:
     args:
       - -c
       - |
-        ls $(params.APP_PATH) | grep *.java
+        ls $(params.OW_APP_PATH) | grep *.java
 ---
 
 
@@ -42,7 +42,7 @@ metadata:
   name: is-python-runtime
 spec:
   params:
-    - name: APP_PATH
+    - name: OW_APP_PATH
       type: string
   check:
     image: ubuntu
@@ -51,4 +51,4 @@ spec:
     args:
       - -c
       - |
-        ls $(params.APP_PATH) | grep *.py
+        ls $(params.OW_APP_PATH) | grep *.py

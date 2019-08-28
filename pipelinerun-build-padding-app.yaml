@@ -6,7 +6,7 @@ spec:
   pipelineRef:
     name: build-openwhisk-app
   params:
-    - name: APP_PATH
+    - name: OW_APP_PATH
       value: "/workspace/git-repo/packages/left-pad/"
     - name: DOCKERFILE
       value: "./runtime-git/core/nodejs10Action/knative/Dockerfile"
