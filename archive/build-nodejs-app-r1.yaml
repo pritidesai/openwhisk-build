@@ -79,7 +79,7 @@ spec:
       default: ""
     - name: ARCHIVE_UTILITY
       default: "zip"
-    - name: ACTION_ARCHIVE_NAME
+    - name: OW_ACTION_ARCHIVE_NAME
       default: "action.zip"
   steps:
   - name: build-action-archive
@@ -90,13 +90,13 @@ spec:
     - -c
     - |
       apt-get update && apt-get install $(inputs.params.ARCHIVE_UTILITY)
-      cd $(inputs.params.OW_APP_PATH) && $(inputs.params.ARCHIVE_UTILITY) $(inputs.params.ACTION_ARCHIVE_NAME) -r *
+      cd $(inputs.params.OW_APP_PATH) && $(inputs.params.ARCHIVE_UTILITY) $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
       if [ $? = 0 ]; then
-        echo "Successfully built and created $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+        echo "Successfully built and created $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
       else
-        echo "Failed to build and archive action source into $(inputs.params.ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
+        echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $(inputs.params.OW_APP_PATH)"
       fi
-      #        base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'
+      #        base64 $(inputs.params.OW_ACTION_ARCHIVE_NAME) | tr -d '[:space:]'
 ---
 
 
@@ -151,7 +151,7 @@ spec:
     - -c
     - |
       cd $(inputs.params.OW_APP_PATH)
-      OW_ACTION_CODE=`base64 $(inputs.params.ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
+      OW_ACTION_CODE=`base64 $(inputs.params.OW_ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
       OW_ACTION_RAW=true
       cd -
       fi
