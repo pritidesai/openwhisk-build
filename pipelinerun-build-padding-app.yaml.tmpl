@@ -1,3 +1,40 @@
+# Git Pipeline Resource for Application Source
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: padding-app-git
+spec:
+  type: git
+  params:
+    - name: url
+      value: https://github.com/apache/openwhisk-test.git
+---
+
+# Git Pipeline Resource for OpenWhisk NodeJS Runtime
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: nodejs-runtime-git
+spec:
+  type: git
+  params:
+    - name: url
+      value: https://github.com/apache/openwhisk-runtime-nodejs.git
+---
+
+
+# Image Pipeline Resource for OpenWhisk NodeJS Sample Application
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: openwhisk-padding-app-image
+spec:
+  type: image
+  params:
+    - name: url
+      value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
+---
+
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
@@ -15,20 +52,11 @@ spec:
       value: "openwhisk-padding-app"
   resources:
     - name: app-git
-      resourceSpec:
-        type: git
-        params:
-          - name: url
-            value: https://github.com/apache/openwhisk-test.git
+      resourceRef:
+        name: padding-app-git
     - name: runtime-git
-      resourceSpec:
-        type: git
-        params:
-          - name: url
-            value: https://github.com/apache/openwhisk-runtime-nodejs.git
+      resourceRef:
+        name: nodejs-runtime-git
     - name: app-image
-      resourceSpec:
-        type: image
-        params:
-          - name: url
-            value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
+      resourceRef:
+        name: openwhisk-padding-app-image
