@@ -44,6 +44,8 @@ else
     kubectl delete serviceaccount openwhisk-app-builder
 fi
 
+# Create Clone Source Task
+kubectl $COMMAND -f tasks/clone-source.yaml
 # Create Install Deps Task
 kubectl $COMMAND -f tasks/install-deps.yaml
 # Create Build Archive Task

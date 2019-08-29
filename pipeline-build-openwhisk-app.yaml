@@ -35,20 +35,35 @@ spec:
     - name: app-image
       type: image
   tasks:
+    - name: clone-source
+      taskRef:
+        name: task-clone-source
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+        outputs:
+          - name: app-git
+            resource: app-git
     #####################################################################
     # Task to Clone Application Source and Install necessary Dependencies
     - name: install-npm-packages
       taskRef:
         name: task-install-npm-packages
-      conditions:
-        - conditionRef: is-nodejs-runtime
-          params:
-            - name: OW_APP_PATH
-              value: $(params.OW_APP_PATH)
+# Conditions do not accept resources yet, only parameters
+# There is a PR open to add support so that conditions work with resources
+# https://github.com/tektoncd/pipeline/pull/1151
+#      conditions:
+#        - conditionRef: is-nodejs-runtime
+#          params:
+#            - name: OW_APP_PATH
+#              value: $(params.OW_APP_PATH)
       resources:
         inputs:
           - name: app-git
             resource: app-git
+            from:
+              - clone-source
         outputs:
           - name: app-git
             resource: app-git
@@ -62,11 +77,14 @@ spec:
     - name: build-archive
       taskRef:
         name: task-build-archive
-      conditions:
-        - conditionRef: is-nodejs-runtime
-          params:
-            - name: OW_APP_PATH
-              value: $(params.OW_APP_PATH)
+# Conditions do not accept resources yet, only parameters
+# There is a PR open to add support so that conditions work with resources
+# https://github.com/tektoncd/pipeline/pull/1151
+#      conditions:
+#        - conditionRef: is-nodejs-runtime
+#          params:
+#            - name: OW_APP_PATH
+#              value: $(params.OW_APP_PATH)
       resources:
         inputs:
           - name: app-git
