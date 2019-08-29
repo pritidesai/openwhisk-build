@@ -16,8 +16,11 @@ if [[ -z $1 ]]; then
     fi
 fi
 
+APPLY="apply"
+DELETE="delete"
+
 if [[ -z $3 ]]; then
-    COMMAND="apply"
+    COMMAND=$APPLY
 else
     COMMAND=$3
 fi
@@ -25,16 +28,21 @@ fi
 DOCKER_USERNAME=$1
 DOCKER_PASSWORD=$2
 
-# Create a Secret with DockerHub credentials
-# https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials
-# https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
-kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
+if [ $COMMAND == $APPLY ]; then
+    # Create a Secret with DockerHub credentials
+    # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials
+    # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
+    kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
 
-# Create a Service Account called openwhisk-runtime-builder
-kubectl create serviceaccount openwhisk-app-builder
+    # Create a Service Account called openwhisk-runtime-builder
+    kubectl create serviceaccount openwhisk-app-builder
 
-# Annotate Service Account with Docker Registry secret
-kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
+    # Annotate Service Account with Docker Registry secret
+    kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
+else
+    kubectl delete secret docker-registry dockerhub-user-pass
+    kubectl delete serviceaccount openwhisk-app-builder
+fi
 
 # Create Install Deps Task
 kubectl $COMMAND -f tasks/install-deps.yaml
@@ -46,8 +54,8 @@ kubectl $COMMAND -f openwhisk.yaml
 kubectl $COMMAND -f detect-runtimes.yaml
 # Create a Pipeline with all three tasks
 kubectl $COMMAND -f pipeline-build-openwhisk-app.yaml
-# Run OpenWhisk Pipeline
-sed -i 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun-build-padding-app.yaml
+# Run OpenWhisk Pipeline after replacing DOCKER_USERNAME with user specified name
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun-build-padding-app.yaml.tmpl > pipelinerun-build-padding-app.yaml
 kubectl $COMMAND -f pipelinerun-build-padding-app.yaml
 
 
