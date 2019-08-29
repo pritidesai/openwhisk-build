@@ -3,7 +3,7 @@ kind: PipelineRun
 metadata:
   name: build-app-image
 spec:
-  serviceAccount: ${SERVICE_ACCOUNT}
+  serviceAccount: openwhisk-app-builder
   pipelineRef:
     name: build-openwhisk-app
   params:

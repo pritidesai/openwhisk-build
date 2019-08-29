@@ -71,6 +71,8 @@ spec:
         inputs:
           - name: app-git
             resource: app-git
+            from:
+              - install-npm-packages
         outputs:
           - name: app-git
             resource: app-git
@@ -90,6 +92,8 @@ spec:
         inputs:
           - name: app-git
             resource: app-git
+            from:
+              - build-archive
           - name: runtime-git
             resource: runtime-git
         outputs:
