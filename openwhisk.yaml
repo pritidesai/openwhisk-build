@@ -72,7 +72,6 @@ spec:
           OW_ACTION_CODE=`base64 $(inputs.params.OW_ACTION_ARCHIVE_NAME) | tr -d '[:space:]'`
           OW_ACTION_RAW=true
           cd -
-          fi
           cat <<EOF >> $(inputs.params.DOCKERFILE)
             ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
             ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"

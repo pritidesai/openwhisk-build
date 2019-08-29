@@ -50,13 +50,42 @@ spec:
       value: "./runtime-git/core/nodejs10Action/knative/Dockerfile"
     - name: OW_ACTION_NAME
       value: "openwhisk-padding-app"
+    - name: OW_APP_NODE_VERSION
+      value: "node"
   resources:
     - name: app-git
       resourceRef:
         name: padding-app-git
+    # Resource Spec under Pipeline Run is not supported yet.
+    # Its being added as part of https://github.com/tektoncd/pipeline/issues/544
+    # as described in design doc for Reduce PipelineResoruce Waste at
+    #  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
+    #     resourceSpec:
+    #        type: git
+    #        params:
+    #           - name: url
+    #             value: https://github.com/apache/openwhisk-test.git
     - name: runtime-git
       resourceRef:
         name: nodejs-runtime-git
+    # Resource Spec under Pipeline Run is not supported yet.
+    # Its being added as part of https://github.com/tektoncd/pipeline/issues/544
+    # as described in design doc for Reduce PipelineResoruce Waste at
+    #  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
+    #     resourceSpec:
+    #        type: git
+    #        params:
+    #           - name: url
+    #             value: https://github.com/apache/openwhisk-runtime-nodejs.git
     - name: app-image
       resourceRef:
         name: openwhisk-padding-app-image
+# Resource Spec under Pipeline Run is not supported yet.
+# Its being added as part of https://github.com/tektoncd/pipeline/issues/544
+# as described in design doc for Reduce PipelineResoruce Waste at
+#  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
+#     resourceSpec:
+#        type: image
+#        params:
+#           - name: url
+#             value: docker.io/${DOCKER_UESRNAME}/openwhisk-padding-app
