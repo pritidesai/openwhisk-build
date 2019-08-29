@@ -100,6 +100,8 @@ spec:
           - name: app-image
             resource: app-image
       params:
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
         - name: DOCKERFILE
           value: $(params.DOCKERFILE)
         - name: OW_RUNTIME_DEBUG
