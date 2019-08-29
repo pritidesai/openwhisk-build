@@ -26,8 +26,6 @@ spec:
       - name: runtime-git
         type: git
     params:
-      - name: OW_APP_PATH
-        default: ""
       - name: DOCKERFILE
         description: The path to the dockerfile to build from Runtime Repo
       - name: OW_RUNTIME_DEBUG
@@ -54,6 +52,10 @@ spec:
       - name: OW_ACTION_RAW
         description: flag to indicate raw HTTP handling, interpret and process an incoming HTTP body directly
         default: "false"
+      - name: OW_APP_PATH
+        default: ""
+      - name: OW_ACTION_ARCHIVE_NAME
+        default: "action.zip"
   outputs:
     resources:
       - name: app-image
@@ -96,4 +98,4 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(inputs.params.DOCKERFILE)
-        - --destination=$(outputs.resources.runtime-image.url)
+        - --destination=$(outputs.resources.app-image.url)
