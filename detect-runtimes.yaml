@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Condition
+metadata:
+  name: is-nodejs-runtime
+spec:
+  params:
+    - name: OW_APP_PATH
+      type: string
+  check:
+    image: ubuntu
+    command:
+      - bash
+    args:
+      - -c
+      - |
+        ls $(params.OW_APP_PATH) | grep *.js
+---
+
+
+apiVersion: tekton.dev/v1alpha1
+kind: Condition
+metadata:
+  name: is-java-runtime
+spec:
+  params:
+    - name: OW_APP_PATH
+      type: string
+  check:
+    image: ubuntu
+    command:
+      - bash
+    args:
+      - -c
+      - |
+        ls $(params.OW_APP_PATH) | grep *.java
+---
+
+
+apiVersion: tekton.dev/v1alpha1
+kind: Condition
+metadata:
+  name: is-python-runtime
+spec:
+  params:
+    - name: OW_APP_PATH
+      type: string
+  check:
+    image: ubuntu
+    command:
+      - bash
+    args:
+      - -c
+      - |
+        ls $(params.OW_APP_PATH) | grep *.py
