@@ -32,16 +32,19 @@ if [ $COMMAND == $APPLY ]; then
     # Create a Secret with DockerHub credentials
     # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials
     # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
-    kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
+    # kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
 
     # Create a Service Account called openwhisk-runtime-builder
-    kubectl create serviceaccount openwhisk-app-builder
+    # kubectl create serviceaccount openwhisk-app-builder
 
     # Annotate Service Account with Docker Registry secret
-    kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
-else
-    kubectl delete secret docker-registry dockerhub-user-pass
-    kubectl delete serviceaccount openwhisk-app-builder
+    # kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' -e 's/${DOCKER_PASSWORD}/'"$DOCKER_PASSWORD"'/' docker-secret.yaml.tmpl > docker-secret.yaml
+    kubectl $COMMAND -f docker-secret.yaml
+    kubectl $COMMAND -f service-account.yaml
+# else
+#    kubectl delete secret docker-registry dockerhub-user-pass
+#    kubectl delete serviceaccount openwhisk-app-builder
 fi
 
 # Create Clone Source Task

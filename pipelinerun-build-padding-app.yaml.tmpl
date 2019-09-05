@@ -52,6 +52,22 @@ spec:
       value: "openwhisk-padding-app"
     - name: OW_APP_NODE_VERSION
       value: "node"
+    - name: OW_RUNTIME_DEBUG
+      value: "false"
+    - name: OW_RUNTIME_PLATFORM
+      value: "knative"
+    - name: OW_ACTION_CODE
+      value: ""
+    - name: OW_ACTION_MAIN
+      value: "main"
+    - name: OW_ACTION_BINARY
+      value: "false"
+    - name: OW_HTTP_METHODS
+      value: "[POST]"
+    - name: OW_ACTION_RAW
+      value: "true"
+    - name: OW_ACTION_ARCHIVE_NAME
+      value: "action.zip"
   resources:
     - name: app-git
       resourceRef:
