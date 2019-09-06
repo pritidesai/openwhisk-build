@@ -29,14 +29,12 @@ fi
 
 if [[ -z $1 ]]; then
     COMMAND=$APPLY
+elif [ "$1" == "$APPLY" ] || [ "$1" == "$DELETE" ]; then
+    COMMAND=$1
 else
-    if [ "$1" == "$APPLY" ] || [ "$1" == "$DELETE" ]; then
-        COMMAND=$1
-    else
-        echo "Invalid Command: $1"
-        echo "$USAGE"
-        exit 1
-    fi
+    echo "Invalid Command: $1"
+    echo "$USAGE"
+    exit 1
 fi
 
 if [ $COMMAND == $APPLY ]; then
