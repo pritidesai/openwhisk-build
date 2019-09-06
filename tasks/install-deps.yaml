@@ -40,11 +40,13 @@ spec:
       args:
         - -c
         - |
+          echo $(inputs.params.OW_APP_PATH)
           if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
             OW_APP_PATH=$(inputs.resources.app-git.path)
           else
             OW_APP_PATH=$(inputs.params.OW_APP_PATH)
           fi
+          echo $OW_APP_PATH
           cd $OW_APP_PATH
           echo "Starting to install Node Packages under $OW_APP_PATH"
           npm install --production --loglevel=error
