@@ -2,31 +2,42 @@
 
 #
 # ARGS:
-#   DOCKER_USERNAME
-#   DOCKER_PASSWORD
 #   COMMAND (default is apply)
 #
-
-USAGE="deploy.sh <DOCKER_USERNAME> <DOCKER_PASSWORD> <COMMAND>"
-
-if [[ -z $1 ]]; then
-    if [[ -z $2 ]]; then
-        echo $USAGE
-        exit 1
-    fi
-fi
 
 APPLY="apply"
 DELETE="delete"
 
-if [[ -z $3 ]]; then
-    COMMAND=$APPLY
-else
-    COMMAND=$3
+USAGE=$(cat <<-END
+Usage:
+    Environment Variables DOCKER_USERNAME and DOCKER_PASSWORD must be set.
+    deploy.sh [$APPLY|$DELETE]
+    Default: deploy.sh $APPLY
+END
+)
+
+
+if [[ -z $DOCKER_USERNAME ]]; then
+    echo "$USAGE"
+    exit 1
 fi
 
-DOCKER_USERNAME=$1
-DOCKER_PASSWORD=$2
+if [[ -z $DOCKER_PASSWORD ]]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+if [[ -z $1 ]]; then
+    COMMAND=$APPLY
+else
+    if [ "$1" == "$APPLY" ] || [ "$1" == "$DELETE" ]; then
+        COMMAND=$1
+    else
+        echo "Invalid Command: $1"
+        echo "$USAGE"
+        exit 1
+    fi
+fi
 
 if [ $COMMAND == $APPLY ]; then
     # Create a Secret with DockerHub credentials
