@@ -71,10 +71,6 @@ spec:
       args:
         - -c
         - |
-          echo "pwd"
-          pwd
-          echo "ls -R"
-          ls -R
           DOCKERFILE_PATH=`echo "$(inputs.params.CONTEXT)" | sed 's/^dir:\/\///'`
           cat <<EOF >> $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
             ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
@@ -86,8 +82,6 @@ spec:
             ENV __OW_HTTP_METHODS "$(inputs.params.OW_HTTP_METHODS)"
             ENV __OW_ACTION_RAW "$(inputs.params.OW_ACTION_RAW)"
           EOF
-          echo "Done updating Dockerfile"
-          cat $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
     - name: build-openwhisk-app-image
       image: "gcr.io/kaniko-project/executor:latest"
       command:
