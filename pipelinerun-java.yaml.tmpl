@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: build-java-app-image
+spec:
+  serviceAccount: openwhisk-app-builder
+  pipelineRef:
+    name: openwhisk-java-app
+  params:
+    - name: OW_APP_PATH
+      value: "app-git/core/java8/proxy/"
+    - name: OW_ACTION_NAME
+      value: "openwhisk-java-app"
+    - name: DOCKERFILE
+      value: "Dockerfile"
+    - name: CONTEXT
+      value: "dir:///workspace/runtime-git/core/java8/"
+  resources:
+    - name: app-git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-runtime-java.git
+          - name: revision
+            value: refs/pull/101/head
+    - name: runtime-git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-runtime-java.git
+          - name: revision
+            value: refs/pull/101/head
+    - name: app-image
+      resourceSpec:
+        type: image
+        params:
+           - name: url
+             value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
