@@ -104,8 +104,8 @@ fi
 
 if [ "$LANGUAGE" == "$JAVA" ]; then
   # Create Build Gradle Task
-  kubectl $OPERATION -f tasks/java/task.yaml
-  kubectl $OPERATION -f openwhisk-java.yaml
+  kubectl $OPERATION -f tasks/java/embed-java-profile.yaml
+  kubectl $OPERATION -f tasks/java/openwhisk.yaml
   kubectl $OPERATION -f pipeline-java.yaml
   sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun-java.yaml.tmpl > pipelinerun-java.yaml
   kubectl $OPERATION -f pipelinerun-java.yaml
