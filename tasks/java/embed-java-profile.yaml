@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: embed-java-profile
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        type: git
+    params:
+      - name: OW_APP_JAVA_VERSION
+        default: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
+        description: "Any specific OpenJDK version needed to compile/run application source on"
+      - name: OW_APP_PATH
+        default: ""
+        description: "Relative or Absolute path to the application source to the build.gradle"
+#      - name: DOCKERFILE
+#        description: "The path to the dockerfile to build from Runtime Repo"
+#        default: "./Dockerfile"
+#      - name: CONTEXT
+#        description: "The path to the dockerfile to build from Runtime Repo"
+#        default: "dir:///workspace"
+  outputs:
+    resources:
+      - name: app-git
+        type: git
+  steps:
+    - name: copy-dependencies
+      image: $(inputs.params.OW_APP_JAVA_VERSION)
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          echo "Downloading profile $(inputs.params.OW_APP_PATH)"
+          cd $(inputs.params.OW_APP_PATH)
+          ./gradlew copyDependencies
+          if [ $? = 0 ]; then
+            echo "Successfully finished downloading profile from $(inputs.params.OW_APP_PATH)"
+          else
+            echo "Failed to download profile from $(inputs.params.OW_APP_PATH)"
+          fi
