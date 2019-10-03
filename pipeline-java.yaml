@@ -16,10 +16,13 @@ spec:
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
       default: "./Dockerfile"
-    - name: CONTEXT
+    - name: OW_RUNTIME_CONTEXT
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
       default: "dir:///workspace"
+    - name: OW_BUILD_CONFIG_PATH
+      description: "The path to the build configuration script (build.gradle) in Runtime Repo"
+      default: "core/java8/proxy/"
     - name: OW_RUNTIME_DEBUG
       description: "flag to indicate debug mode should be on/off"
       type: string
@@ -67,16 +70,16 @@ spec:
         name: embed-java-profile
       resources:
         inputs:
-          - name: app-git
-            resource: app-git
+          - name: runtime-git
+            resource: runtime-git
         outputs:
-          - name: app-git
-            resource: app-git
+          - name: runtime-git
+            resource: runtime-git
       params:
         - name: OW_APP_JAVA_VERSION
           value: $(params.OW_APP_JAVA_VERSION)
-        - name: OW_APP_PATH
-          value: $(params.OW_APP_PATH)
+        - name: OW_BUILD_CONFIG_PATH
+          value: $(params.OW_BUILD_CONFIG_PATH)
     #####################################################################
     # Task to Clone Application Source and Run Build Gradle
     - name: create-one-jar
@@ -84,18 +87,18 @@ spec:
         name: create-one-jar
       resources:
         inputs:
-          - name: app-git
-            resource: app-git
+          - name: runtime-git
+            resource: runtime-git
             from:
               - run-build-gradle
         outputs:
-          - name: app-git
-            resource: app-git
+          - name: runtime-git
+            resource: runtime-git
       params:
         - name: OW_APP_JAVA_VERSION
           value: $(params.OW_APP_JAVA_VERSION)
-        - name: OW_APP_PATH
-          value: $(params.OW_APP_PATH)
+        - name: OW_BUILD_CONFIG_PATH
+          value: $(params.OW_BUILD_CONFIG_PATH)
     #####################################################################
     - name: openwhisk-java-runtime
       taskRef:
@@ -104,10 +107,10 @@ spec:
         inputs:
           - name: app-git
             resource: app-git
-            from:
-              - create-one-jar
           - name: runtime-git
             resource: runtime-git
+            from:
+              - create-one-jar
         outputs:
           - name: app-image
             resource: app-image
@@ -118,8 +121,8 @@ spec:
 #          value: $(params.OW_APP_JAVA_VERSION)
         - name: DOCKERFILE
           value: $(params.DOCKERFILE)
-        - name: CONTEXT
-          value: $(params.CONTEXT)
+        - name: OW_RUNTIME_CONTEXT
+          value: $(params.OW_RUNTIME_CONTEXT)
         - name: OW_RUNTIME_DEBUG
           value: $(params.OW_RUNTIME_DEBUG)
         - name: OW_RUNTIME_PLATFORM

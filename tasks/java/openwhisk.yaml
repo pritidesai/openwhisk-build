@@ -13,7 +13,7 @@ spec:
       - name: DOCKERFILE
         description: "The path to the dockerfile to build from Runtime Repo"
         default: "./Dockerfile"
-      - name: CONTEXT
+      - name: OW_RUNTIME_CONTEXT
         description: "The path to the dockerfile to build from Runtime Repo"
         default: "dir:///workspace"
       - name: OW_RUNTIME_DEBUG
@@ -55,7 +55,7 @@ spec:
       args:
         - -c
         - |
-          DOCKERFILE_PATH=`echo "$(inputs.params.CONTEXT)" | sed 's/^dir:\/\///'`
+          DOCKERFILE_PATH=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
           cat <<EOF >> $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
             ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
             ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"
@@ -71,6 +71,6 @@ spec:
       command:
         - /kaniko/executor
       args:
-        - --context=$(inputs.params.CONTEXT)
+        - --context=$(inputs.params.OW_RUNTIME_CONTEXT)
         - --dockerfile=$(inputs.params.DOCKERFILE)
         - --destination=$(outputs.resources.app-image.url)
