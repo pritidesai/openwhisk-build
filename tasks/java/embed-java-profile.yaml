@@ -32,11 +32,19 @@ spec:
       args:
         - -c
         - |
-          echo "Downloading profile $(inputs.params.OW_APP_PATH)"
-          cd $(inputs.params.OW_APP_PATH)
-          ./gradlew copyDependencies
+          echo "Copy GitHub repo contents from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
+          echo "INFO: cp -r $(inputs.resources.app-git.path) $(outputs.resources.app-git.path)"
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
           if [ $? = 0 ]; then
-            echo "Successfully finished downloading profile from $(inputs.params.OW_APP_PATH)"
+            echo "INFO: Successfully copied GitHub repo from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
+            cd $(outputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH)
+            echo "INFO: Downloading profile $(inputs.params.OW_APP_PATH)"
+            ./gradlew copyDependencies
+            if [ $? = 0 ]; then
+              echo "INFO: Successfully finished downloading profile from $(inputs.params.OW_APP_PATH)"
+            else
+              echo "ERROR: Failed to download profile from $(inputs.params.OW_APP_PATH)"
+            fi
           else
-            echo "Failed to download profile from $(inputs.params.OW_APP_PATH)"
+            echo "ERROR: Failed to copy GitHub repo from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
           fi
