@@ -7,12 +7,12 @@ spec:
   pipelineRef:
     name: openwhisk-java-app
   params:
-    - name: OW_APP_PATH
+    - name: OW_BUILD_CONFIG_PATH
       value: "core/java8/proxy/"
     - name: OW_ACTION_NAME
       value: "openwhisk-java-app"
-    - name: CONTEXT
-      value: "dir:///workspace/runtime-git/core/java8/"
+    - name: OW_RUNTIME_CONTEXT
+      value: "core/java8/"
   resources:
     - name: app-git
       resourceSpec:
