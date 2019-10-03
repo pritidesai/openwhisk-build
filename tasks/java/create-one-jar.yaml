@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: create-one-jar
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        type: git
+    params:
+      - name: OW_APP_JAVA_VERSION
+        default: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
+        description: "Any specific OpenJDK version needed to compile/run application source on"
+      - name: OW_APP_PATH
+        default: ""
+        description: "Relative or Absolute path to the application source to the build.gradle"
+#      - name: DOCKERFILE
+#        description: "The path to the dockerfile to build from Runtime Repo"
+#        default: "./Dockerfile"
+#      - name: CONTEXT
+#        description: "The path to the dockerfile to build from Runtime Repo"
+#        default: "dir:///workspace"
+  outputs:
+    resources:
+      - name: app-git
+        type: git
+  steps:
+    - name: create-one-jar
+      image: $(inputs.params.OW_APP_JAVA_VERSION)
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          echo "Copy GitHub repo contents from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
+          echo "INFO: cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)"
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+          if [ $? = 0 ]; then
+            echo "INFO: Successfully copied GitHub repo from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
+            cd $(outputs.resources.app-git.path)/$(inputs.params.OW_APP_PATH)
+            echo "INFO: Creating oneJar $(inputs.params.OW_APP_PATH)"
+            ./gradlew oneJar
+            if [ $? = 0 ]; then
+              echo "Successfully created oneJar under $(inputs.params.OW_APP_PATH)"
+            else
+              echo "Failed to create oneJar under $(inputs.params.OW_APP_PATH)"
+            fi
+          else
+            echo "ERROR: Failed to copy GitHub repo from $(inputs.resources.app-git.path) to $(outputs.resources.app-git.path)"
+          fi
