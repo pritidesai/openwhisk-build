@@ -15,7 +15,7 @@ spec:
     - name: DOCKERFILE
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
-      default: "./Dockerfile"
+      default: "Dockerfile"
     - name: OW_RUNTIME_CONTEXT
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string

@@ -12,10 +12,10 @@ spec:
     params:
       - name: DOCKERFILE
         description: "The path to the dockerfile to build from Runtime Repo"
-        default: "./Dockerfile"
+        default: "Dockerfile"
       - name: OW_RUNTIME_CONTEXT
         description: "The path to the dockerfile to build from Runtime Repo"
-        default: "dir:///workspace"
+        default: "dir:///workspace/runtime-git/"
       - name: OW_RUNTIME_DEBUG
         description: "flag to indicate debug mode should be on/off"
         default: "false"
