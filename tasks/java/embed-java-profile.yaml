@@ -7,6 +7,8 @@ spec:
     resources:
       - name: runtime-git
         type: git
+      - name: app-git
+        type: git
     params:
       - name: OW_APP_JAVA_VERSION
         default: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
