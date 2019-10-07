@@ -104,6 +104,7 @@ fi
 
 if [ "$LANGUAGE" == "$JAVA" ]; then
   # Create Build Gradle Task
+  kubectl $OPERATION -f tasks/java/build-jar-file.yaml  
   kubectl $OPERATION -f tasks/java/embed-java-profile.yaml
   kubectl $OPERATION -f tasks/java/create-one-jar.yaml
   kubectl $OPERATION -f tasks/java/openwhisk.yaml

@@ -1,0 +1,47 @@
+# Task to clone application source
+#
+# Inputs:
+#   * app-git: GitHub Repo with application source
+#
+# Outputs:
+#   * app-git: GitHub Repo with application source
+#
+#
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: run-maven-against-pom
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        type: git
+  outputs:
+    resources:
+      - name: app-git
+        type: git
+  steps:
+    - name: list-app-source
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          ls -R $(inputs.resources.app-git.path)/
+    - name: build-with-maven
+      image: maven:latest
+      command:
+        - mvn
+      args:
+        - -f
+        - $(inputs.resources.app-git.path)/
+        - package
+  
+    - name: copy-output
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
