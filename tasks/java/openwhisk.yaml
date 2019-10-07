@@ -48,24 +48,20 @@ spec:
       - name: app-image
         type: image
   steps:
-    - name: add-ow-env-to-dockerfile
+    - name: update-dockerfile-for-tekton
       image: ubuntu
       command:
         - bash
       args:
         - -c
         - |
+          pwd
+          ls -R .
           DOCKERFILE_PATH=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
-          cat <<EOF >> $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
-            ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
-            ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"
-            ENV __OW_ACTION_NAME "$(inputs.params.OW_ACTION_NAME)"
-            ENV __OW_ACTION_CODE "$(inputs.params.OW_ACTION_CODE)"
-            ENV __OW_ACTION_MAIN "$(inputs.params.OW_ACTION_MAIN)"
-            ENV __OW_ACTION_BINARY "$(inputs.params.OW_ACTION_BINARY)"
-            ENV __OW_HTTP_METHODS "$(inputs.params.OW_HTTP_METHODS)"
-            ENV __OW_ACTION_RAW "$(inputs.params.OW_ACTION_RAW)"
-          EOF
+          sed -i -e 's/&& rm -rf .classpath .gitignore .gradle .project .settings Dockerfile build \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
+          sed -i -e 's/&& \.\/gradlew oneJar \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
+          sed -i -e 's/&& rm -rf \/javaAction\/src \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
+          sed -i -e 's/&& \.\/gradlew copyDependencies \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
     - name: build-openwhisk-app-image
       image: "gcr.io/kaniko-project/executor:latest"
       command:
