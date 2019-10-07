@@ -64,12 +64,28 @@ spec:
       type: image
   tasks:
     #####################################################################
+    # Task to Clone App Source and build app jar with maven
+    - name: run-package-maven
+      taskRef:
+        name: run-maven-against-pom
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+        outputs:
+          - name: app-git
+            resource: app-git
+    #####################################################################
     # Task to Clone Application Source and Run Build Gradle
     - name: run-build-gradle
       taskRef:
         name: embed-java-profile
       resources:
         inputs:
+          - name: app-git
+            resource: app-git
+            from:
+              - run-package-maven
           - name: runtime-git
             resource: runtime-git
         outputs:
