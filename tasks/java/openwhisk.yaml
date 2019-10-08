@@ -26,8 +26,6 @@ spec:
       args:
         - -c
         - |
-          pwd
-          ls -R .
           DOCKERFILE_PATH=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
           sed -i -e 's/&& rm -rf .classpath .gitignore .gradle .project .settings Dockerfile build \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
           sed -i -e 's/&& \.\/gradlew oneJar \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
