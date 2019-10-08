@@ -26,21 +26,8 @@ spec:
       args:
         - -c
         - |
-          echo "Copy Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
-          echo "INFO: cp -r $(inputs.resources.runtime-git.path) $(outputs.resources.runtime-git.path)"
           cp -r $(inputs.resources.runtime-git.path)/* $(outputs.resources.runtime-git.path)
+          cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew oneJar
           if [ $? = 0 ]; then
-            echo "INFO: Successfully copied Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
-            cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH)
-            echo "INFO: Creating oneJar under $(inputs.params.OW_BUILD_CONFIG_PATH)"
-            ./gradlew oneJar
-            if [ $? = 0 ]; then
-              echo "INFO: Successfully created oneJar under $(inputs.params.OW_BUILD_CONFIG_PATH)"
-              echo "INFO: Renaming JAR file to javaAction-all.jar"
-              mv build/libs/proxy-all.jar build/libs/javaAction-all.jar
-            else
-              echo "Failed to create oneJar under $(inputs.params.OW_BUILD_CONFIG_PATH)"
-            fi
-          else
-            echo "ERROR: Failed to copy Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
+            mv build/libs/proxy-all.jar build/libs/javaAction-all.jar
           fi

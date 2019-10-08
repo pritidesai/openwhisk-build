@@ -5,8 +5,6 @@ metadata:
 spec:
   inputs:
     resources:
-      - name: app-git
-        type: git
       - name: runtime-git
         type: git
     params:
@@ -16,33 +14,6 @@ spec:
       - name: OW_RUNTIME_CONTEXT
         description: "The path to the dockerfile to build from Runtime Repo"
         default: "dir:///workspace/runtime-git/"
-      - name: OW_RUNTIME_DEBUG
-        description: "flag to indicate debug mode should be on/off"
-        default: "false"
-      - name: OW_RUNTIME_PLATFORM
-        description: "flag to indicate the platform, one of [openwhisk, knative, ... ]"
-        default: "knative"
-      - name: OW_ACTION_NAME
-        description: "name of the action"
-        default: ""
-      - name: OW_ACTION_CODE
-        description: "JavaScript source code to be evaluated"
-        default: ""
-      - name: OW_ACTION_MAIN
-        description: "name of the function in the __OW_ACTION_CODE to call as the action handler"
-        default: "main"
-      - name: OW_ACTION_BINARY
-        description: "flag to indicate zip function, for zip actions, __OW_ACTION_CODE must be base64 encoded string"
-        default: "true"
-      - name: OW_HTTP_METHODS
-        description: "list of HTTP methods, any combination of [GET, POST, PUT, and DELETE], default is [POST]"
-        default: "[POST]"
-      - name: OW_ACTION_RAW
-        description: "flag to indicate raw HTTP handling, interpret and process an incoming HTTP body directly"
-        default: "false"
-      - name: OW_APP_PATH
-        description: "Relative or Absolute path of the application source in the GitHub repo"
-        default: ""
   outputs:
     resources:
       - name: app-image

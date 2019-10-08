@@ -5,9 +5,9 @@ metadata:
 spec:
   inputs:
     resources:
-      - name: runtime-git
-        type: git
       - name: app-git
+        type: git
+      - name: runtime-git
         type: git
     params:
       - name: OW_APP_JAVA_VERSION
@@ -28,19 +28,5 @@ spec:
       args:
         - -c
         - |
-          echo "Copy Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
-          echo "INFO: cp -r $(inputs.resources.runtime-git.path) $(outputs.resources.runtime-git.path)"
           cp -r $(inputs.resources.runtime-git.path)/* $(outputs.resources.runtime-git.path)
-          if [ $? = 0 ]; then
-            echo "INFO: Successfully copied Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
-            cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH)
-            echo "INFO: Downloading profile $(inputs.params.OW_BUILD_CONFIG_PATH)"
-            ./gradlew copyDependencies
-            if [ $? = 0 ]; then
-              echo "INFO: Successfully finished downloading profile from $(inputs.params.OW_BUILD_CONFIG_PATH)"
-            else
-              echo "ERROR: Failed to download profile from $(inputs.params.OW_BUILD_CONFIG_PATH)"
-            fi
-          else
-            echo "ERROR: Failed to copy Java runtime repo from $(inputs.resources.runtime-git.path) to $(outputs.resources.runtime-git.path)"
-          fi
+          cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew copyDependencies
