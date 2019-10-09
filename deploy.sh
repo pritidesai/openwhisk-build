@@ -92,23 +92,23 @@ if [ "$LANGUAGE" == "$JAVASCRIPT" ]; then
   # Create Build Archive Task
   kubectl $OPERATION -f tasks/javascript/build-archive.yaml
   # Create OpenWhisk Task
-  kubectl $OPERATION -f openwhisk.yaml
+  kubectl $OPERATION -f tasks/openwhisk.yaml
   # Create Conditions Detecting Runtimes
-  kubectl $OPERATION -f detect-runtimes.yaml
+  kubectl $OPERATION -f tasks/detect-runtimes.yaml
   # Create a Pipeline with all three tasks
-  kubectl $OPERATION -f pipeline-build-openwhisk-app.yaml
+  kubectl $OPERATION -f pipeline/javascript/pipeline-build-openwhisk-app.yaml
   # Run OpenWhisk Pipeline after replacing DOCKER_USERNAME with user specified name
-  sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun-build-padding-app.yaml.tmpl > pipelinerun-build-padding-app.yaml
-  kubectl $OPERATION -f pipelinerun-build-padding-app.yaml
+  sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl > pipelinerun/javascript/pipelinerun-build-padding-app.yaml
+  kubectl $OPERATION -f pipelinerun/javascript/pipelinerun-build-padding-app.yaml
 fi
 
 if [ "$LANGUAGE" == "$JAVA" ]; then
   # Create Build Gradle Task
-  kubectl $OPERATION -f tasks/java/build-jar-file.yaml  
-  kubectl $OPERATION -f tasks/java/embed-java-profile.yaml
-  kubectl $OPERATION -f tasks/java/create-one-jar.yaml
-  kubectl $OPERATION -f tasks/java/openwhisk.yaml
-  kubectl $OPERATION -f pipeline-java.yaml
-  sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun-java.yaml.tmpl > pipelinerun-java.yaml
-  kubectl $OPERATION -f pipelinerun-java.yaml
+  kubectl $OPERATION -f tasks/java/01-build-jar-file.yaml
+  kubectl $OPERATION -f tasks/java/02-embed-java-profile.yaml
+  kubectl $OPERATION -f tasks/java/03-create-one-jar.yaml
+  kubectl $OPERATION -f tasks/java/04-openwhisk.yaml
+  kubectl $OPERATION -f pipeline/java/pipeline-java.yaml
+  sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+  kubectl $OPERATION -f pipelinerun/java/pipelinerun-java.yaml
 fi
