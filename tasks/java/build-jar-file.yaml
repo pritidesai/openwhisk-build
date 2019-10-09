@@ -26,4 +26,13 @@ spec:
         - bash
       args:
         - -c
-        - cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+        - |
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+    - name: list-out-jar-content
+      image: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          jar tf /workspace/app-git/target/java-openwhisk-example-app-1.0-SNAPSHOT.jar
