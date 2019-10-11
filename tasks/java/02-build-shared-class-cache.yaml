@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: embed-java-profile
+  name: build-shared-class-cache
 spec:
   inputs:
     resources:
@@ -21,7 +21,7 @@ spec:
       - name: runtime-git
         type: git
   steps:
-    - name: copy-dependencies
+    - name: build-shared-class-cache
       image: $(inputs.params.OW_APP_JAVA_VERSION)
       command:
         - bash

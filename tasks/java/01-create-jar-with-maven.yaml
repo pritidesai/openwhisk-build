@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: create-jar-with-maven
+spec:
+  inputs:
+    resources:
+      - name: app-git
+        type: git
+    params:
+      - name: JAR_NAME
+        default: "OWAutoInit"
+        description: "Jar name of the application source"
+      - name: MAVEN_BUILD_OUTPUT_PATH
+        default: "./"
+        description: "Maven build path where the jar file is created"
+  outputs:
+    resources:
+      - name: app-git
+        type: git
+  steps:
+    - name: maven-clean
+      image: maven:latest
+      command:
+        - mvn
+      args:
+        - -f
+        - $(inputs.resources.app-git.path)/
+        - clean
+    - name: maven-package
+      image: maven:latest
+      command:
+        - mvn
+      args:
+        - -f
+        - $(inputs.resources.app-git.path)/
+        - package
+        - -DMAVEN_BUILD_OUTPUT_PATH=$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)
+        - -DJAR_NAME=$(inputs.params.JAR_NAME)
+    - name: copy-jar-to-output-workspace
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+    - name: list-out-jar-contents
+      image: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME)

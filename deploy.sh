@@ -104,10 +104,10 @@ fi
 
 if [ "$LANGUAGE" == "$JAVA" ]; then
   # Create Build Gradle Task
-  kubectl $OPERATION -f tasks/java/01-build-jar-file.yaml
-  kubectl $OPERATION -f tasks/java/02-embed-java-profile.yaml
-  kubectl $OPERATION -f tasks/java/03-create-one-jar.yaml
-  kubectl $OPERATION -f tasks/java/04-openwhisk.yaml
+  kubectl $OPERATION -f tasks/java/01-create-jar-with-maven.yaml
+  kubectl $OPERATION -f tasks/java/02-build-shared-class-cache.yaml
+  kubectl $OPERATION -f tasks/java/03-build-runtime-with-gradle.yaml
+  kubectl $OPERATION -f tasks/java/04-finalize-runtime-with-function.yaml
   kubectl $OPERATION -f pipeline/java/pipeline-java.yaml
   sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
   kubectl $OPERATION -f pipelinerun/java/pipelinerun-java.yaml

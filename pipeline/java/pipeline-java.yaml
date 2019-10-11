@@ -19,6 +19,14 @@ spec:
     - name: OW_BUILD_CONFIG_PATH
       description: "The path to the build configuration script (build.gradle) in Runtime Repo"
       default: "core/java8/proxy/"
+    - name: JAR_NAME
+      description: "Jar name of the application source"
+      type: string
+      default: "OWAutoInit"
+    - name: MAVEN_BUILD_OUTPUT_PATH
+      description: "Maven build path where the jar file is created"
+      type: string
+      default: "./"
   resources:
     - name: app-git
       type: git
@@ -29,9 +37,9 @@ spec:
   tasks:
     #####################################################################
     # Task to Clone App Source and build app jar with maven
-    - name: create-jar-file-with-maven
+    - name: create-jar-with-maven
       taskRef:
-        name: run-maven-against-pom
+        name: create-jar-with-maven
       resources:
         inputs:
           - name: app-git
@@ -39,17 +47,22 @@ spec:
         outputs:
           - name: app-git
             resource: app-git
+        params:
+          - name: MAVEN_BUILD_OUTPUT_PATH
+            value: $(params.MAVEN_BUILD_OUTPUT_PATH)
+          - name: JAR_NAME
+            value: $(params.JAR_NAME)
     #####################################################################
     # Task to Clone Application Source and Run Build Gradle
-    - name: run-build-gradle
+    - name: build-shared-class-cache
       taskRef:
-        name: embed-java-profile
+        name: build-shared-class-cache
       resources:
         inputs:
           - name: app-git
             resource: app-git
             from:
-              - create-jar-file-with-maven
+              - create-jar-with-maven
           - name: runtime-git
             resource: runtime-git
         outputs:
@@ -62,15 +75,15 @@ spec:
           value: $(params.OW_BUILD_CONFIG_PATH)
     #####################################################################
     # Task to Clone Application Source and Run Build Gradle
-    - name: create-one-jar
+    - name: build-runtime-with-gradle
       taskRef:
-        name: create-one-jar
+        name: build-runtime-with-gradle
       resources:
         inputs:
           - name: runtime-git
             resource: runtime-git
             from:
-              - run-build-gradle
+              - build-shared-class-cache
         outputs:
           - name: runtime-git
             resource: runtime-git
@@ -80,15 +93,15 @@ spec:
         - name: OW_BUILD_CONFIG_PATH
           value: $(params.OW_BUILD_CONFIG_PATH)
     #####################################################################
-    - name: openwhisk-java-runtime
+    - name: finalize-runtime-with-function
       taskRef:
-        name: openwhisk-java-runtime
+        name: finalize-runtime-with-function
       resources:
         inputs:
           - name: runtime-git
             resource: runtime-git
             from:
-              - create-one-jar
+              - build-runtime-with-gradle
         outputs:
           - name: app-image
             resource: app-image
@@ -97,3 +110,7 @@ spec:
           value: $(params.DOCKERFILE)
         - name: OW_RUNTIME_CONTEXT
           value: $(params.OW_RUNTIME_CONTEXT)
+        - name: MAVEN_BUILD_OUTPUT_PATH
+          value: $(params.MAVEN_BUILD_OUTPUT_PATH)
+        - name: JAR_NAME
+          value: $(params.JAR_NAME)
