@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: openwhisk-java-runtime
+  name: finalize-runtime-with-function
 spec:
   inputs:
     resources:
@@ -14,11 +14,37 @@ spec:
       - name: OW_RUNTIME_CONTEXT
         description: "The path to the dockerfile to build from Runtime Repo"
         default: "dir:///workspace/runtime-git/"
+      - name: OW_AUTO_INIT
+        description: "Base64 encoded Jar file contents"
+        default: ""
+      - name: OW_AUTO_INIT_MAIN
+        description: "name of the function in the __OW_AUTO_INIT to call as the action handler"
+        default: "main"
+      - name: JAR_NAME
+        default: "OWAutoInit"
+        description: "Jar name of the application source"
+      - name: MAVEN_BUILD_OUTPUT_PATH
+        default: "./"
+        description: "Maven build path where the jar file is created"
   outputs:
     resources:
       - name: app-image
         type: image
   steps:
+    - name: add-ow-env-to-dockerfile
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          base64 $ARCHIVE | tr -d '[:space:]'
+          OW_AUTO_INIT=`base64 $(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME) | tr -d '[:space:]'`
+          DOCKERFILE_PATH=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
+          cat <<EOF >> $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
+            ENV __OW_AUTO_INIT "$OW_AUTO_INIT"
+            ENV __OW_AUTO_INIT_MAIN "$(inputs.params.OW_AUTO_INIT_MAIN)"
+          EOF
     - name: update-dockerfile-for-tekton
       image: ubuntu
       command:
@@ -31,7 +57,7 @@ spec:
           sed -i -e 's/&& \.\/gradlew oneJar \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
           sed -i -e 's/&& rm -rf \/javaAction\/src \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
           sed -i -e 's/&& \.\/gradlew copyDependencies \\//g' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)
-    - name: build-openwhisk-app-image
+    - name: build-app-image-with-function
       image: "gcr.io/kaniko-project/executor:latest"
       command:
         - /kaniko/executor
