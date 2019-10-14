@@ -52,4 +52,4 @@ spec:
       args:
         - -c
         - |
-          jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME)
+          jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar

@@ -5,8 +5,6 @@ metadata:
 spec:
   inputs:
     resources:
-      - name: app-git
-        type: git
       - name: runtime-git
         type: git
     params:

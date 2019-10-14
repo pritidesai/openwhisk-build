@@ -47,11 +47,11 @@ spec:
         outputs:
           - name: app-git
             resource: app-git
-        params:
-          - name: MAVEN_BUILD_OUTPUT_PATH
-            value: $(params.MAVEN_BUILD_OUTPUT_PATH)
-          - name: JAR_NAME
-            value: $(params.JAR_NAME)
+      params:
+        - name: MAVEN_BUILD_OUTPUT_PATH
+          value: $(params.MAVEN_BUILD_OUTPUT_PATH)
+        - name: JAR_NAME
+          value: $(params.JAR_NAME)
     #####################################################################
     # Task to Clone Application Source and Run Build Gradle
     - name: build-shared-class-cache
@@ -59,10 +59,6 @@ spec:
         name: build-shared-class-cache
       resources:
         inputs:
-          - name: app-git
-            resource: app-git
-            from:
-              - create-jar-with-maven
           - name: runtime-git
             resource: runtime-git
         outputs:
@@ -98,6 +94,10 @@ spec:
         name: finalize-runtime-with-function
       resources:
         inputs:
+          - name: app-git
+            resource: app-git
+            from:
+              - create-jar-with-maven
           - name: runtime-git
             resource: runtime-git
             from:
