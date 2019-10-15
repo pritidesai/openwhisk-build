@@ -28,7 +28,7 @@ spec:
         - $(inputs.resources.app-git.path)/
         - clean
     - name: maven-package
-      image: maven:latest
+      image: maven
       command:
         - mvn
       args:
@@ -53,3 +53,11 @@ spec:
         - -c
         - |
           jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
+    - name: size-of-jar
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          ls -lh /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
