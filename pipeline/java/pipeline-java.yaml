@@ -27,6 +27,10 @@ spec:
       description: "Maven build path where the jar file is created"
       type: string
       default: "./"
+    - name: OW_AUTO_INIT_MAIN
+      description: "Function name"
+      type: string
+      default: "main"
   resources:
     - name: app-git
       type: git
@@ -114,3 +118,5 @@ spec:
           value: $(params.MAVEN_BUILD_OUTPUT_PATH)
         - name: JAR_NAME
           value: $(params.JAR_NAME)
+        - name: OW_AUTO_INIT_MAIN
+          value: $(params.OW_AUTO_INIT_MAIN)

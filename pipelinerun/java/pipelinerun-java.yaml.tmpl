@@ -13,6 +13,8 @@ spec:
       value: "openwhisk-java-app"
     - name: OW_RUNTIME_CONTEXT
       value: "dir:///workspace/runtime-git/knative-build/runtimes/java/core/java8/"
+    - name: OW_AUTO_INIT_MAIN
+      value: "Hello"
   resources:
     - name: app-git
       resourceSpec:
