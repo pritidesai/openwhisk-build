@@ -39,8 +39,6 @@ spec:
     - name: app-image
       type: image
   tasks:
-    #####################################################################
-    # Task to Clone App Source and build app jar with maven
     - name: create-jar-with-maven
       taskRef:
         name: create-jar-with-maven
@@ -56,25 +54,6 @@ spec:
           value: $(params.MAVEN_BUILD_OUTPUT_PATH)
         - name: JAR_NAME
           value: $(params.JAR_NAME)
-    #####################################################################
-    # Task to Clone Application Source and Run Build Gradle
-    - name: build-shared-class-cache
-      taskRef:
-        name: build-shared-class-cache
-      resources:
-        inputs:
-          - name: runtime-git
-            resource: runtime-git
-        outputs:
-          - name: runtime-git
-            resource: runtime-git
-      params:
-        - name: OW_APP_JAVA_VERSION
-          value: $(params.OW_APP_JAVA_VERSION)
-        - name: OW_BUILD_CONFIG_PATH
-          value: $(params.OW_BUILD_CONFIG_PATH)
-    #####################################################################
-    # Task to Clone Application Source and Run Build Gradle
     - name: build-runtime-with-gradle
       taskRef:
         name: build-runtime-with-gradle
@@ -82,8 +61,6 @@ spec:
         inputs:
           - name: runtime-git
             resource: runtime-git
-            from:
-              - build-shared-class-cache
         outputs:
           - name: runtime-git
             resource: runtime-git
@@ -92,7 +69,23 @@ spec:
           value: $(params.OW_APP_JAVA_VERSION)
         - name: OW_BUILD_CONFIG_PATH
           value: $(params.OW_BUILD_CONFIG_PATH)
-    #####################################################################
+    - name: build-shared-class-cache
+      taskRef:
+        name: build-shared-class-cache
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+            from:
+              - build-runtime-with-gradle
+        outputs:
+          - name: runtime-git
+            resource: runtime-git
+      params:
+        - name: OW_APP_JAVA_VERSION
+          value: $(params.OW_APP_JAVA_VERSION)
+        - name: OW_BUILD_CONFIG_PATH
+          value: $(params.OW_BUILD_CONFIG_PATH)
     - name: finalize-runtime-with-function
       taskRef:
         name: finalize-runtime-with-function
@@ -105,7 +98,7 @@ spec:
           - name: runtime-git
             resource: runtime-git
             from:
-              - build-runtime-with-gradle
+              - build-shared-class-cache
         outputs:
           - name: app-image
             resource: app-image
