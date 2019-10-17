@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: build-shared-class-cache
+  name: build-runtime-with-gradle
 spec:
   inputs:
     resources:
@@ -19,7 +19,7 @@ spec:
       - name: runtime-git
         type: git
   steps:
-    - name: build-shared-class-cache
+    - name: build-runtime-with-gradle
       image: $(inputs.params.OW_APP_JAVA_VERSION)
       command:
         - bash
