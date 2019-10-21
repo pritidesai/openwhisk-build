@@ -10,7 +10,8 @@ DELETE="delete"
 OPERATION=$APPLY
 JAVASCRIPT="javascript"
 JAVA="java"
-LANGUAGE=$JAVASCRIPT
+LANGUAGE=$JAVA
+DELAY=0
 
 USAGE=$(cat <<-END
 Usage:
@@ -65,24 +66,27 @@ if [ "$LANGUAGE" != "$JAVASCRIPT" ] && [ "$LANGUAGE" != "$JAVA" ]; then
   exit 1
 fi
 
-if [ "$OPERATION" == "$APPLY" ]; then
-    # Create a Secret with DockerHub credentials
-    # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials
-    # https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
-    # kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
+# Create a Secret with DockerHub credentials
+# https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials
+# https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
+# kubectl create secret docker-registry dockerhub-user-pass --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD
 
-    # Create a Service Account called openwhisk-runtime-builder
-    # kubectl create serviceaccount openwhisk-app-builder
+# Create a Service Account called openwhisk-runtime-builder
+# kubectl create serviceaccount openwhisk-app-builder
 
-    # Annotate Service Account with Docker Registry secret
-    # kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
-    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' -e 's/${DOCKER_PASSWORD}/'"$DOCKER_PASSWORD"'/' docker-secret.yaml.tmpl > docker-secret.yaml
-    kubectl $OPERATION -f docker-secret.yaml
-    kubectl $OPERATION -f service-account.yaml
+# Annotate Service Account with Docker Registry secret
+# kubectl annotate serviceaccount openwhisk-app-builder secret=dockerhub-user-pass
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' -e 's/${DOCKER_PASSWORD}/'"$DOCKER_PASSWORD"'/' docker-secret.yaml.tmpl > docker-secret.yaml
+printf "\nCreating secret [dockerhub-user-pass] to publish the Serverless Function Image.\n"
+kubectl $OPERATION -f docker-secret.yaml
+sleep $DELAY
+
+printf "\nCreating service account [openwhisk-app-builder] with the secret just created.\n"
+kubectl $OPERATION -f service-account.yaml
+sleep $DELAY
 # else
 #    kubectl delete secret docker-registry dockerhub-user-pass
 #    kubectl delete serviceaccount openwhisk-app-builder
-fi
 
 if [ "$LANGUAGE" == "$JAVASCRIPT" ]; then
   # Create Clone Source Task
@@ -104,11 +108,28 @@ fi
 
 if [ "$LANGUAGE" == "$JAVA" ]; then
   # Create Build Gradle Task
+  printf "\nINFO: Creating task [create-jar-with-maven] to Clone Java App Source and Create Jar using Maven\n"
   kubectl $OPERATION -f tasks/java/01-create-jar-with-maven.yaml
+  sleep $DELAY
+
+  printf "\nINFO: Creating task [build-runtime-with-gradle] to select JDK version along with the base image with optional Framework and Profile Libraries\n"
   kubectl $OPERATION -f tasks/java/02-build-runtime-with-gradle.yaml
+  sleep $DELAY
+
+  printf "\nINFO: Creating task [build-shared-class-cache] to Compile and Create shared Class Cache for JVM\n"
   kubectl $OPERATION -f tasks/java/03-build-shared-class-cache.yaml
+  sleep $DELAY
+
+  printf "\nINFO: Creating task [finalize-runtime-with-function] to finalize Serverless Java Function Image and Publish\n"
   kubectl $OPERATION -f tasks/java/04-finalize-runtime-with-function.yaml
+  sleep $DELAY
+
+  printf "\nINFO: Creating Pipeline [pipeline-java] combining all the Tasks from above.\n"
   kubectl $OPERATION -f pipeline/java/pipeline-java.yaml
+  sleep $DELAY
+
   sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+  printf "\nINFO: Creating PipelineRun [pipelinerun-java] to Execute the Java pipeline.\n"
   kubectl $OPERATION -f pipelinerun/java/pipelinerun-java.yaml
+  sleep $DELAY
 fi
