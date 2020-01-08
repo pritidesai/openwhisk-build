@@ -1,7 +1,8 @@
 # Building OpenWhisk Java Application with Tekton for Knative
 
 In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an image with OpenWhisk Java Runtime serving an application source from GitHub repo.
-FollowingHere is the list of `Tasks` created: 
+
+Here is the list of `Tasks` created:
 
 * [01-create-jar-with-maven.yaml](tasks/java/01-create-jar-with-maven.yaml) - Pull Java Application with an OpenWhisk action
 from an open GitHub repo, with java action taking an image and converting it into gray image. Compile the source code
@@ -21,16 +22,82 @@ Jar into the OpenWhisk runtime and build/publish an image.
 
 ![Java Pipeline](java-pipeline.jpg)
 
-This entire pipeline is designed in [pipeline-java.yaml](pipeline/java/pipeline-java.yaml) including all the `Tasks` defined above and
+This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.  
 
-Deploy `Tasks`, `Pipeline` and `Pipelinerun` using [deploy.sh](deploy.sh):
+Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh):
+
+[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
 
 ```shell script
 ./deploy.sh
+secret/dockerhub-user-pass configured
+serviceaccount/openwhisk-app-builder configured
+condition.tekton.dev/is-nodejs-runtime created
+condition.tekton.dev/is-java-runtime created
+condition.tekton.dev/is-python-runtime created
+task.tekton.dev/task-clone-source created
+task.tekton.dev/task-install-npm-packages created
+task.tekton.dev/task-build-archive created
+task.tekton.dev/openwhisk created
+task.tekton.dev/create-jar-with-maven created
+task.tekton.dev/build-runtime-with-gradle created
+task.tekton.dev/build-shared-class-cache created
+task.tekton.dev/finalize-runtime-with-function created
+pipeline.tekton.dev/build-openwhisk-app created
 ```
 
-[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
+Execute `PipelineRun` with:
+
+```shell script
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+kubectl apply -f pipelinerun/java/pipelinerun-java.yaml
+```
+
+Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
+
+```shell script
+kubectl get all
+NAME                                                                  READY   STATUS      RESTARTS   AGE
+pod/build-java-app-image-build-runtime-with-gradle-5s7pt-pod-x6btf    0/5     Completed   0          4m1s
+pod/build-java-app-image-build-shared-class-cache-7w9q6-pod-5dw4n     0/6     Completed   0          3m27s
+pod/build-java-app-image-create-jar-with-maven-9l6hh-is-java--mcrlw   0/2     Completed   0          5m37s
+pod/build-java-app-image-create-jar-with-maven-9l6hh-pod-t6c2x        0/9     Completed   0          5m22s
+pod/build-java-app-image-finalize-runtime-with-function-59qfw-fxhgt   0/10    Completed   0          2m53s
+pod/build-java-app-image-install-npm-packages-xzgvz-is-nodejs-tkmzn   0/2     Error       0          5m37s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   96d
+
+NAME                                                                                 SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+taskrun.tekton.dev/build-java-app-image-build-runtime-with-gradle-5s7pt              True        Succeeded   4m1s        3m27s
+taskrun.tekton.dev/build-java-app-image-build-shared-class-cache-7w9q6               True        Succeeded   3m27s       2m53s
+taskrun.tekton.dev/build-java-app-image-create-jar-with-maven-9l6hh                  True        Succeeded   5m22s       4m1s
+taskrun.tekton.dev/build-java-app-image-create-jar-with-maven-9l6hh-is-java--gxqfx   True        Succeeded   5m37s       5m22s
+taskrun.tekton.dev/build-java-app-image-finalize-runtime-with-function-59qfw         True        Succeeded   2m53s       92s
+taskrun.tekton.dev/build-java-app-image-install-npm-packages-xzgvz-is-nodejs-6g7hb   False       Failed      5m37s       5m22s
+
+NAME                                     AGE
+condition.tekton.dev/is-java-runtime     16m
+condition.tekton.dev/is-nodejs-runtime   16m
+condition.tekton.dev/is-python-runtime   16m
+
+NAME                                          SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+pipelinerun.tekton.dev/build-java-app-image   True        Succeeded   5m37s       92s
+
+NAME                                             AGE
+task.tekton.dev/build-runtime-with-gradle        16m
+task.tekton.dev/build-shared-class-cache         16m
+task.tekton.dev/create-jar-with-maven            16m
+task.tekton.dev/finalize-runtime-with-function   16m
+task.tekton.dev/openwhisk                        16m
+task.tekton.dev/task-build-archive               16m
+task.tekton.dev/task-clone-source                16m
+task.tekton.dev/task-install-npm-packages        16m
+
+NAME                                      AGE
+pipeline.tekton.dev/build-openwhisk-app   16m
+```
 
 Create a new service on Knative with:
 
