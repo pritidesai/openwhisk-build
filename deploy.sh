@@ -72,16 +72,16 @@ kubectl $OPERATION -f tasks/detect-runtimes.yaml
 
 # NodeJS Runtime related Tasks
 # Create Clone Source Task
-kubectl $OPERATION -f tasks/javascript/clone-source.yaml
+kubectl $OPERATION -f tasks/javascript/01-clone-source.yaml
 
 # Create Install Deps Task
-kubectl $OPERATION -f tasks/javascript/install-deps.yaml
+kubectl $OPERATION -f tasks/javascript/02-install-deps.yaml
 
 # Create Build Archive Task
-kubectl $OPERATION -f tasks/javascript/build-archive.yaml
+kubectl $OPERATION -f tasks/javascript/03-build-archive.yaml
 
 # Create OpenWhisk Task
-kubectl $OPERATION -f tasks/openwhisk.yaml
+kubectl $OPERATION -f tasks/javascript/04-openwhisk.yaml
 
 # Java Runtime related Tasks
 # Create Jar file Task
@@ -99,11 +99,10 @@ kubectl $OPERATION -f tasks/java/04-finalize-runtime-with-function.yaml
 # Create Pipeline
 kubectl $OPERATION -f pipeline/pipeline-to-build-openwhisk-app.yaml
 
-
 # Run OpenWhisk Pipeline for NodeJS App after replacing DOCKER_USERNAME with user specified name
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl > pipelinerun/javascript/pipelinerun-build-padding-app.yaml
-kubectl $OPERATION -f pipelinerun/javascript/pipelinerun-build-padding-app.yaml
+# sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl > pipelinerun/javascript/pipelinerun-build-padding-app.yaml
+# kubectl $OPERATION -f pipelinerun/javascript/pipelinerun-build-padding-app.yaml
 
 # Run OpenWhisk Pipeline for Java App after replacing DOCKER_USERNAME with user specified name
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
-kubectl $OPERATION -f pipelinerun/java/pipelinerun-java.yaml
+# sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+# kubectl $OPERATION -f pipelinerun/java/pipelinerun-java.yaml
