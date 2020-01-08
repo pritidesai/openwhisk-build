@@ -18,6 +18,7 @@ spec:
     - name: DOCKERFILE
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
+      default: "Dockerfile"
     - name: OW_RUNTIME_DEBUG
       description: "flag to indicate debug mode should be on/off"
       type: string
@@ -50,6 +51,30 @@ spec:
       description: "flag to indicate raw HTTP handling, interpret and process an incoming HTTP body directly"
       type: string
       default: "false"
+    # Parameters for Java Applications
+    - name: OW_APP_JAVA_VERSION
+      description: "Any specific Node version needed to compile/run application source on"
+      type: string
+      default: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
+    - name: OW_RUNTIME_CONTEXT
+      description: "The path to the dockerfile to build from Runtime Repo"
+      type: string
+      default: "dir:///workspace"
+    - name: OW_BUILD_CONFIG_PATH
+      description: "The path to the build configuration script (build.gradle) in Runtime Repo"
+      default: "core/java8/proxy/"
+    - name: JAR_NAME
+      description: "Jar name of the application source"
+      type: string
+      default: "OWAutoInit"
+    - name: MAVEN_BUILD_OUTPUT_PATH
+      description: "Maven build path where the jar file is created"
+      type: string
+      default: "./"
+    - name: OW_AUTO_INIT_MAIN
+      description: "Function name"
+      type: string
+      default: "main"
   resources:
     - name: app-git
       type: git
@@ -144,3 +169,94 @@ spec:
         - name: OW_ACTION_ARCHIVE_NAME
           value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
+    # Create application JAR with maven
+    - name: create-jar-with-maven
+      taskRef:
+        name: create-jar-with-maven
+      conditions:
+        - conditionRef: is-java-runtime
+          params:
+            - name: OW_APP_PATH
+              value: $(params.OW_APP_PATH)
+          resources:
+            - name: app-git
+              resource: app-git
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+        outputs:
+          - name: app-git
+            resource: app-git
+      params:
+        - name: MAVEN_BUILD_OUTPUT_PATH
+          value: $(params.MAVEN_BUILD_OUTPUT_PATH)
+        - name: JAR_NAME
+          value: $(params.JAR_NAME)
+    #####################################################################
+    # Build runtime with gradle, run after creating application JAR
+    - name: build-runtime-with-gradle
+      taskRef:
+        name: build-runtime-with-gradle
+      runAfter:
+        - create-jar-with-maven
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+        outputs:
+          - name: runtime-git
+            resource: runtime-git
+      params:
+        - name: OW_APP_JAVA_VERSION
+          value: $(params.OW_APP_JAVA_VERSION)
+        - name: OW_BUILD_CONFIG_PATH
+          value: $(params.OW_BUILD_CONFIG_PATH)
+    #####################################################################
+    # Build shared class cache, run after building runtime
+    - name: build-shared-class-cache
+      taskRef:
+        name: build-shared-class-cache
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+            from:
+              - build-runtime-with-gradle
+        outputs:
+          - name: runtime-git
+            resource: runtime-git
+      params:
+        - name: OW_APP_JAVA_VERSION
+          value: $(params.OW_APP_JAVA_VERSION)
+        - name: OW_BUILD_CONFIG_PATH
+          value: $(params.OW_BUILD_CONFIG_PATH)
+    #####################################################################
+    # Finalize runtime with function source - JAR file, run after building shared class cache
+    - name: finalize-runtime-with-function
+      taskRef:
+        name: finalize-runtime-with-function
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+            from:
+              - create-jar-with-maven
+          - name: runtime-git
+            resource: runtime-git
+            from:
+              - build-shared-class-cache
+        outputs:
+          - name: app-image
+            resource: app-image
+      params:
+        - name: DOCKERFILE
+          value: $(params.DOCKERFILE)
+        - name: OW_RUNTIME_CONTEXT
+          value: $(params.OW_RUNTIME_CONTEXT)
+        - name: MAVEN_BUILD_OUTPUT_PATH
+          value: $(params.MAVEN_BUILD_OUTPUT_PATH)
+        - name: JAR_NAME
+          value: $(params.JAR_NAME)
+        - name: OW_AUTO_INIT_MAIN
+          value: $(params.OW_AUTO_INIT_MAIN)
