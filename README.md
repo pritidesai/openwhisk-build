@@ -35,8 +35,8 @@ Deploy `Tasks`, `Pipeline` and `Pipelinerun` using [deploy.sh](deploy.sh):
 Create a new service on Knative with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service-openwhisk-java-app.yaml.tmpl > service-openwhisk-java-app.yaml
-kubectl apply -f service-openwhisk-java-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service/service-openwhisk-java-app.yaml.tmpl > service/service-openwhisk-java-app.yaml
+kubectl apply -f service/service-openwhisk-java-app.yaml
 ```
 
 Run OpenWhisk Java Application service with few different images:
