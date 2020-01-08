@@ -71,17 +71,14 @@ kubectl $OPERATION -f service-account.yaml
 kubectl $OPERATION -f tasks/detect-runtimes.yaml
 
 # NodeJS Runtime related Tasks
-# Create Clone Source Task
-kubectl $OPERATION -f tasks/javascript/01-clone-source.yaml
-
 # Create Install Deps Task
-kubectl $OPERATION -f tasks/javascript/02-install-deps.yaml
+kubectl $OPERATION -f tasks/javascript/01-install-deps.yaml
 
 # Create Build Archive Task
-kubectl $OPERATION -f tasks/javascript/03-build-archive.yaml
+kubectl $OPERATION -f tasks/javascript/02-build-archive.yaml
 
 # Create OpenWhisk Task
-kubectl $OPERATION -f tasks/javascript/04-openwhisk.yaml
+kubectl $OPERATION -f tasks/javascript/03-openwhisk.yaml
 
 # Java Runtime related Tasks
 # Create Jar file Task
