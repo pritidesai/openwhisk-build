@@ -39,9 +39,18 @@ spec:
     - name: app-image
       type: image
   tasks:
+    # Create application JAR with maven
     - name: create-jar-with-maven
       taskRef:
         name: create-jar-with-maven
+      conditions:
+        - conditionRef: is-java-runtime
+          params:
+            - name: OW_APP_PATH
+              value: $(params.OW_APP_PATH)
+          resources:
+            - name: app-git
+              resource: app-git
       resources:
         inputs:
           - name: app-git
@@ -54,9 +63,12 @@ spec:
           value: $(params.MAVEN_BUILD_OUTPUT_PATH)
         - name: JAR_NAME
           value: $(params.JAR_NAME)
+    # Build runtime with gradle, run after creating application JAR
     - name: build-runtime-with-gradle
       taskRef:
         name: build-runtime-with-gradle
+      runAfter:
+        - create-jar-with-maven
       resources:
         inputs:
           - name: runtime-git
@@ -69,6 +81,7 @@ spec:
           value: $(params.OW_APP_JAVA_VERSION)
         - name: OW_BUILD_CONFIG_PATH
           value: $(params.OW_BUILD_CONFIG_PATH)
+    # Build shared class cache, run after building runtime
     - name: build-shared-class-cache
       taskRef:
         name: build-shared-class-cache
@@ -86,6 +99,7 @@ spec:
           value: $(params.OW_APP_JAVA_VERSION)
         - name: OW_BUILD_CONFIG_PATH
           value: $(params.OW_BUILD_CONFIG_PATH)
+    # Finalize runtime with function source - JAR file, run after building shared class cache
     - name: finalize-runtime-with-function
       taskRef:
         name: finalize-runtime-with-function
