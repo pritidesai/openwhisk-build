@@ -21,13 +21,11 @@ spec:
   steps:
     - name: build-shared-class-cache
       image: $(inputs.params.OW_APP_JAVA_VERSION)
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          cp -r $(inputs.resources.runtime-git.path)/* $(outputs.resources.runtime-git.path)
-          cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew oneJar
-          if [ $? = 0 ]; then
-            mv build/libs/proxy-all.jar build/libs/javaAction-all.jar
-          fi
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        cp -r $(inputs.resources.runtime-git.path)/* $(outputs.resources.runtime-git.path)
+        cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew oneJar
+        if [ $? = 0 ]; then
+          mv build/libs/proxy-all.jar build/libs/javaAction-all.jar
+        fi
