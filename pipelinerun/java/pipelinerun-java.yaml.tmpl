@@ -3,9 +3,9 @@ kind: PipelineRun
 metadata:
   name: build-java-app-image
 spec:
-  serviceAccount: openwhisk-app-builder
+  serviceAccountName: openwhisk-app-builder
   pipelineRef:
-    name: openwhisk-java-app
+    name: build-openwhisk-app
   params:
     - name: OW_BUILD_CONFIG_PATH
       value: "knative-build/runtimes/java/core/java8/proxy/"

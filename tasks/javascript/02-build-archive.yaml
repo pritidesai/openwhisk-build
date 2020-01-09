@@ -37,15 +37,26 @@ spec:
       args:
         - -c
         - |
+          echo $(inputs.params.OW_APP_PATH)
           apt-get update && apt-get install zip
           if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
             OW_APP_PATH=$(inputs.resources.app-git.path)
           else
             OW_APP_PATH=$(inputs.params.OW_APP_PATH)
           fi
-          cd $OW_APP_PATH && zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
+          cd $OW_APP_PATH
+          echo "Starting to create an archive under $OW_APP_PATH"
+          zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
           if [ $? = 0 ]; then
             echo "Successfully built and created $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $OW_APP_PATH"
           else
             echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $OW_APP_PATH"
           fi
+    - name: copy-action-archive-to-output-workspace
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
