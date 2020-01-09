@@ -39,25 +39,19 @@ spec:
         - -DJAR_NAME=$(inputs.params.JAR_NAME)
     - name: copy-jar-to-output-workspace
       image: ubuntu
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
     - name: list-out-jar-contents
       image: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
     - name: size-of-jar
       image: ubuntu
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          ls -lh /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        ls -lh /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar

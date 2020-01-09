@@ -35,31 +35,27 @@ spec:
   steps:
     - name: install-node-packages
       image: $(inputs.params.OW_APP_NODE_VERSION)
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          echo $(inputs.params.OW_APP_PATH)
-          if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
-            OW_APP_PATH=$(inputs.resources.app-git.path)
-          else
-            OW_APP_PATH=$(inputs.params.OW_APP_PATH)
-          fi
-          echo $OW_APP_PATH
-          cd $OW_APP_PATH
-          echo "Starting to install Node Packages under $OW_APP_PATH"
-          npm install --production --loglevel=error
-          if [ $? = 0 ]; then
-            echo "Successfully finished installing Node Packages under $OW_APP_PATH"
-          else
-            echo "Failed to install Node Packages under $OW_APP_PATH"
-          fi
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        echo $(inputs.params.OW_APP_PATH)
+        if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
+          OW_APP_PATH=$(inputs.resources.app-git.path)
+        else
+          OW_APP_PATH=$(inputs.params.OW_APP_PATH)
+        fi
+        echo $OW_APP_PATH
+        cd $OW_APP_PATH
+        echo "Starting to install Node Packages under $OW_APP_PATH"
+        npm install --production --loglevel=error
+        if [ $? = 0 ]; then
+          echo "Successfully finished installing Node Packages under $OW_APP_PATH"
+        else
+          echo "Failed to install Node Packages under $OW_APP_PATH"
+        fi
     - name: copy-app-git-to-output-workspace
       image: ubuntu
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
