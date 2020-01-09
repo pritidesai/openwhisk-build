@@ -1,46 +1,9 @@
-# Git Pipeline Resource for Application Source
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: padding-app-git
-spec:
-  type: git
-  params:
-    - name: url
-      value: https://github.com/apache/openwhisk-test.git
----
-
-# Git Pipeline Resource for OpenWhisk NodeJS Runtime
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: nodejs-runtime-git
-spec:
-  type: git
-  params:
-    - name: url
-      value: https://github.com/apache/openwhisk-runtime-nodejs.git
----
-
-
-# Image Pipeline Resource for OpenWhisk NodeJS Sample Application
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: openwhisk-padding-app-image
-spec:
-  type: image
-  params:
-    - name: url
-      value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app:latest
----
-
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
   name: build-app-image
 spec:
-  serviceAccount: openwhisk-app-builder
+  serviceAccountName: openwhisk-app-builder
   pipelineRef:
     name: build-openwhisk-app
   params:
@@ -52,38 +15,20 @@ spec:
       value: "openwhisk-padding-app"
   resources:
     - name: app-git
-      resourceRef:
-        name: padding-app-git
-    # Resource Spec under Pipeline Run is not supported yet.
-    # Its being added as part of https://github.com/tektoncd/pipeline/issues/544
-    # as described in design doc for Reduce PipelineResoruce Waste at
-    #  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
-    #     resourceSpec:
-    #        type: git
-    #        params:
-    #           - name: url
-    #             value: https://github.com/apache/openwhisk-test.git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-test.git
     - name: runtime-git
-      resourceRef:
-        name: nodejs-runtime-git
-    # Resource Spec under Pipeline Run is not supported yet.
-    # Its being added as part of https://github.com/tektoncd/pipeline/issues/544
-    # as described in design doc for Reduce PipelineResoruce Waste at
-    #  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
-    #     resourceSpec:
-    #        type: git
-    #        params:
-    #           - name: url
-    #             value: https://github.com/apache/openwhisk-runtime-nodejs.git
+      resourceSpec:
+        type: git
+        params:
+          - name: url
+            value: https://github.com/apache/openwhisk-runtime-nodejs.git
     - name: app-image
-      resourceRef:
-        name: openwhisk-padding-app-image
-# Resource Spec under Pipeline Run is not supported yet.
-# Its being added as part of https://github.com/tektoncd/pipeline/issues/544
-# as described in design doc for Reduce PipelineResoruce Waste at
-#  https://docs.google.com/document/d/1fF2vWMs12d3FwkqkNuzS7FzQFQSFz1ZKUe6CHqkIg0c/edit#heading=h.p6vldiammjrz
-#     resourceSpec:
-#        type: image
-#        params:
-#           - name: url
-#             value: docker.io/${DOCKER_UESRNAME}/openwhisk-padding-app
+      resourceSpec:
+        type: image
+        params:
+          - name: url
+            value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
