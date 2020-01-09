@@ -51,8 +51,8 @@ pipeline.tekton.dev/build-openwhisk-app created
 Execute `PipelineRun` with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl > pipelinerun/javascript/pipelinerun-build-padding-app.yaml
-kubectl apply -f pipelinerun/javascript/pipelinerun-build-padding-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+kubectl apply -f pipelinerun/java/pipelinerun-java.yaml
 ```
 
 Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
