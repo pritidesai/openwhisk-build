@@ -64,31 +64,29 @@ spec:
   steps:
     - name: add-ow-env-to-dockerfile
       image: ubuntu
-      command:
-        - bash
-      args:
-        - -c
-        - |
-          echo $(inputs.params.OW_APP_PATH)
-          cd $(inputs.params.OW_APP_PATH)
-          pwd
-          ARCHIVE=$(inputs.params.OW_ACTION_ARCHIVE_NAME)
-          echo $ARCHIVE
-          base64 $ARCHIVE | tr -d '[:space:]'
-          OW_ACTION_CODE=`base64 $ARCHIVE | tr -d '[:space:]'`
-          echo $OW_ACTION_CODE
-          cd /workspace/
-          cat <<EOF >> $(inputs.params.DOCKERFILE)
-            ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
-            ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"
-            ENV __OW_ACTION_NAME "$(inputs.params.OW_ACTION_NAME)"
-            ENV __OW_ACTION_CODE "$OW_ACTION_CODE"
-            ENV __OW_ACTION_MAIN "$(inputs.params.OW_ACTION_MAIN)"
-            ENV __OW_ACTION_BINARY "$(inputs.params.OW_ACTION_BINARY)"
-            ENV __OW_HTTP_METHODS "$(inputs.params.OW_HTTP_METHODS)"
-            ENV __OW_ACTION_RAW "$(inputs.params.OW_ACTION_RAW)"
-          EOF
-          echo "Done updating Dockerfile"
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        echo $(inputs.params.OW_APP_PATH)
+        cd $(inputs.params.OW_APP_PATH)
+        pwd
+        ARCHIVE=$(inputs.params.OW_ACTION_ARCHIVE_NAME)
+        echo $ARCHIVE
+        base64 $ARCHIVE | tr -d '[:space:]'
+        OW_ACTION_CODE=`base64 $ARCHIVE | tr -d '[:space:]'`
+        echo $OW_ACTION_CODE
+        cd /workspace/
+        cat <<EOF >> $(inputs.params.DOCKERFILE)
+          ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
+          ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"
+          ENV __OW_ACTION_NAME "$(inputs.params.OW_ACTION_NAME)"
+          ENV __OW_ACTION_CODE "$OW_ACTION_CODE"
+          ENV __OW_ACTION_MAIN "$(inputs.params.OW_ACTION_MAIN)"
+          ENV __OW_ACTION_BINARY "$(inputs.params.OW_ACTION_BINARY)"
+          ENV __OW_HTTP_METHODS "$(inputs.params.OW_HTTP_METHODS)"
+          ENV __OW_ACTION_RAW "$(inputs.params.OW_ACTION_RAW)"
+        EOF
+        echo "Done updating Dockerfile"
     - name: update-dockerfile-for-tekton
       image: ubuntu
       command:
