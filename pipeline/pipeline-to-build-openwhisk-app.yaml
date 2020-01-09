@@ -140,6 +140,7 @@ spec:
             resource: app-git
             from:
               - build-archive
+              - install-npm-packages
           - name: runtime-git
             resource: runtime-git
         outputs:

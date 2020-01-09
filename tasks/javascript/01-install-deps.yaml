@@ -55,3 +55,11 @@ spec:
           else
             echo "Failed to install Node Packages under $OW_APP_PATH"
           fi
+    - name: copy-app-git-to-output-workspace
+      image: ubuntu
+      command:
+        - bash
+      args:
+        - -c
+        - |
+          cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
