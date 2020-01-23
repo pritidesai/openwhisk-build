@@ -5,8 +5,6 @@
 #   * OW_APP_NODE_VERSION: any specific Node Version you want to pull, default is "node"
 #   * OW_APP_PATH: path to application directory within the GitHub repo, default is ""
 #
-# OutPuts:
-#   * app-git: GitHub repo with an Application Source along with all the dependencies installed
 #
 # Application source is cloned under /workspace/<resource-name> by default if targetPath is not specified.
 #
@@ -17,6 +15,8 @@ kind: Task
 metadata:
   name: task-install-npm-packages
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
     resources:
       - name: app-git
@@ -28,10 +28,6 @@ spec:
       - name: OW_APP_PATH
         default: ""
         description: "Relative or Absolute path to the application source"
-  outputs:
-    resources:
-      - name: app-git
-        type: git
   steps:
     - name: install-node-packages
       image: $(inputs.params.OW_APP_NODE_VERSION)
@@ -53,9 +49,9 @@ spec:
         else
           echo "Failed to install Node Packages under $OW_APP_PATH"
         fi
-    - name: copy-app-git-to-output-workspace
+    - name: copy-app-git-to-openwhisk-workspace
       image: ubuntu
       script: |
         #!/usr/bin/env bash
         set -xe
-        cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
+        cp -avr $(inputs.resources.app-git.path)/ $(workspaces.openwhisk-workspace.path)/

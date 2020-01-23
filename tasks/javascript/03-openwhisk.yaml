@@ -1,7 +1,6 @@
 # Task to pull OpenWhisk Runtime and update the runtime Dockerfile with an application source
 #
 # Inputs:
-#   * app-git: GitHub Repo with an application source
 #   * runtime-git: GitHub Repo with an OpenWhisk Runtime
 #   * DOCKERFILE
 #   * OW_RUNTIME_DEBUG
@@ -19,10 +18,10 @@ kind: Task
 metadata:
   name: openwhisk
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
     resources:
-      - name: app-git
-        type: git
       - name: runtime-git
         type: git
     params:
@@ -67,8 +66,8 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        echo $(inputs.params.OW_APP_PATH)
-        cd $(inputs.params.OW_APP_PATH)
+        echo $(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
+        cd $(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
         pwd
         ARCHIVE=$(inputs.params.OW_ACTION_ARCHIVE_NAME)
         echo $ARCHIVE

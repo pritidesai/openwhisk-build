@@ -6,6 +6,10 @@ spec:
   serviceAccountName: openwhisk-app-builder
   pipelineRef:
     name: build-openwhisk-app
+  workspaces:
+    - name: openwhisk-workspace
+      persistentVolumeClaim:
+        claimName: openwhisk-workspace
   params:
     - name: OW_APP_PATH
       value: "app-git/packages/left-pad/"

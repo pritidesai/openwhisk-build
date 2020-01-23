@@ -14,10 +14,9 @@ kind: Task
 metadata:
   name: task-build-archive
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: app-git
-        type: git
     params:
       - name: OW_APP_NODE_VERSION
         default: "node"
@@ -25,10 +24,6 @@ spec:
         default: ""
       - name: OW_ACTION_ARCHIVE_NAME
         default: "action.zip"
-  outputs:
-    resources:
-      - name: app-git
-        type: git
   steps:
     - name: build-action-archive
       image: $(inputs.params.OW_APP_NODE_VERSION)
@@ -37,11 +32,7 @@ spec:
         set -xe
         echo $(inputs.params.OW_APP_PATH)
         apt-get update && apt-get install zip
-        if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
-          OW_APP_PATH=$(inputs.resources.app-git.path)
-        else
-          OW_APP_PATH=$(inputs.params.OW_APP_PATH)
-        fi
+        OW_APP_PATH=$(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
         cd $OW_APP_PATH
         echo "Starting to create an archive under $OW_APP_PATH"
         zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *
@@ -50,9 +41,3 @@ spec:
         else
           echo "Failed to build and archive action source into $(inputs.params.OW_ACTION_ARCHIVE_NAME) under $OW_APP_PATH"
         fi
-    - name: copy-action-archive-to-output-workspace
-      image: ubuntu
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)

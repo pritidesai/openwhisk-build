@@ -70,6 +70,9 @@ kubectl $OPERATION -f service-account.yaml
 # Create Conditions Detecting Runtimes
 kubectl $OPERATION -f tasks/detect-runtimes.yaml
 
+# Create Persistent Volume
+kubectl $OPERATION -f tasks/persistent-volume-claim.yaml
+
 # NodeJS Runtime related Tasks
 # Create Install Deps Task
 kubectl $OPERATION -f tasks/javascript/01-install-deps.yaml
