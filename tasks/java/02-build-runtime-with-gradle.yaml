@@ -3,6 +3,8 @@ kind: Task
 metadata:
   name: build-runtime-with-gradle
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
     resources:
       - name: runtime-git
@@ -13,16 +15,12 @@ spec:
         description: "Any specific OpenJDK version needed to compile/run application source on"
       - name: OW_BUILD_CONFIG_PATH
         description: "The path to the build configuration script (build.gradle) in Runtime Repo"
-        default: "core/java8/proxy/"
-  outputs:
-    resources:
-      - name: runtime-git
-        type: git
+        default: "runtime-git/core/java8/proxy/"
   steps:
     - name: build-runtime-with-gradle
       image: $(inputs.params.OW_APP_JAVA_VERSION)
       script: |
         #!/usr/bin/env bash
         set -xe
-        cp -r $(inputs.resources.runtime-git.path)/* $(outputs.resources.runtime-git.path)
-        cd $(outputs.resources.runtime-git.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew copyDependencies
+        cp -avr $(inputs.resources.runtime-git.path)/ $(workspaces.openwhisk-workspace.path)/
+        cd $(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_BUILD_CONFIG_PATH) && ./gradlew copyDependencies

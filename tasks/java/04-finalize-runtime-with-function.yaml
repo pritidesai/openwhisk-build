@@ -3,19 +3,16 @@ kind: Task
 metadata:
   name: finalize-runtime-with-function
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: app-git
-        type: git
-      - name: runtime-git
-        type: git
     params:
       - name: DOCKERFILE
         description: "The path to the dockerfile to build from Runtime Repo"
         default: "Dockerfile"
       - name: OW_RUNTIME_CONTEXT
         description: "The path to the dockerfile to build from Runtime Repo"
-        default: "dir:///workspace/runtime-git/"
+        default: "dir:///workspaces/openwhisk-workspace/runtime-git/"
       - name: OW_AUTO_INIT
         description: "Base64 encoded Jar file contents"
         default: ""
@@ -26,7 +23,7 @@ spec:
         default: "OWAutoInit"
         description: "Jar name of the application source"
       - name: MAVEN_BUILD_OUTPUT_PATH
-        default: "./"
+        default: "./app-git/"
         description: "Maven build path where the jar file is created"
   outputs:
     resources:
@@ -38,9 +35,9 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        JAR_FILE_WITH_PATH=`realpath $(inputs.resources.app-git.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar`
+        JAR_FILE_WITH_PATH=`realpath $(workspaces.openwhisk-workspace.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar`
         CONTEXT=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
-        JAR_FILE_PATH=$CONTEXT/$(inputs.resources.app-git.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)
+        JAR_FILE_PATH=$CONTEXT/$(workspaces.openwhisk-workspace.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)
         mkdir -p $JAR_FILE_PATH
         cp $JAR_FILE_WITH_PATH $JAR_FILE_PATH
     - name: add-ow-env-to-dockerfile
@@ -48,7 +45,7 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        JAR_FILE_WITH_PATH=`realpath $(inputs.resources.app-git.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar`
+        JAR_FILE_WITH_PATH=`realpath $(workspaces.openwhisk-workspace.path)/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar`
         JAR_FILE=$(inputs.params.JAR_NAME).jar
         DOCKERFILE_PATH=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
         sed -i -e '/^CMD.*/i ADD "'"$JAR_FILE_WITH_PATH"'" "'"/javaAction/$JAR_FILE"'"\nENV OW_AUTO_INIT "'"/javaAction/$JAR_FILE"'"\nENV OW_AUTO_INIT_MAIN "$(inputs.params.OW_AUTO_INIT_MAIN)"' $DOCKERFILE_PATH/$(inputs.params.DOCKERFILE)

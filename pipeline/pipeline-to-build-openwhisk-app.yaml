@@ -180,11 +180,11 @@ spec:
           resources:
             - name: app-git
               resource: app-git
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       resources:
         inputs:
-          - name: app-git
-            resource: app-git
-        outputs:
           - name: app-git
             resource: app-git
       params:
@@ -199,11 +199,11 @@ spec:
         name: build-runtime-with-gradle
       runAfter:
         - create-jar-with-maven
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       resources:
         inputs:
-          - name: runtime-git
-            resource: runtime-git
-        outputs:
           - name: runtime-git
             resource: runtime-git
       params:
@@ -216,15 +216,11 @@ spec:
     - name: build-shared-class-cache
       taskRef:
         name: build-shared-class-cache
-      resources:
-        inputs:
-          - name: runtime-git
-            resource: runtime-git
-            from:
-              - build-runtime-with-gradle
-        outputs:
-          - name: runtime-git
-            resource: runtime-git
+      runAfter:
+        - build-runtime-with-gradle
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       params:
         - name: OW_APP_JAVA_VERSION
           value: $(params.OW_APP_JAVA_VERSION)
@@ -235,16 +231,13 @@ spec:
     - name: finalize-runtime-with-function
       taskRef:
         name: finalize-runtime-with-function
+      runAfter:
+        - create-jar-with-maven
+        - build-shared-class-cache
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       resources:
-        inputs:
-          - name: app-git
-            resource: app-git
-            from:
-              - create-jar-with-maven
-          - name: runtime-git
-            resource: runtime-git
-            from:
-              - build-shared-class-cache
         outputs:
           - name: app-image
             resource: app-image
