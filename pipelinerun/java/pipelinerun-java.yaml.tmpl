@@ -6,13 +6,17 @@ spec:
   serviceAccountName: openwhisk-app-builder
   pipelineRef:
     name: build-openwhisk-app
+  workspaces:
+    - name: openwhisk-workspace
+      persistentVolumeClaim:
+        claimName: openwhisk-workspace
   params:
     - name: OW_BUILD_CONFIG_PATH
-      value: "knative-build/runtimes/java/core/java8/proxy/"
+      value: "runtime-git/knative-build/runtimes/java/core/java8/proxy/"
     - name: OW_ACTION_NAME
       value: "openwhisk-java-app"
     - name: OW_RUNTIME_CONTEXT
-      value: "dir:///workspace/runtime-git/knative-build/runtimes/java/core/java8/"
+      value: "dir:///workspace/openwhisk-workspace/runtime-git/knative-build/runtimes/java/core/java8/"
     - name: OW_AUTO_INIT_MAIN
       value: "Hello"
   resources:
