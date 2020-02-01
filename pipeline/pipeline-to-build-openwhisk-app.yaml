@@ -232,7 +232,6 @@ spec:
       taskRef:
         name: finalize-runtime-with-function
       runAfter:
-        - create-jar-with-maven
         - build-shared-class-cache
       workspaces:
         - name: openwhisk-workspace

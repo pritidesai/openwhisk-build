@@ -40,4 +40,4 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        cp -avr $(inputs.resources.app-git.path)/ $(workspaces.openwhisk-workspace.path)/
+        cp $(inputs.resources.app-git.path)/$(inputs.params.JAR_NAME).jar $(workspaces.openwhisk-workspace.path)/
