@@ -33,7 +33,7 @@ spec:
     - name: copy-jar-under-runtime-context
       image: ubuntu
       script: |
-#        !/usr/bin/env bash
+        !/usr/bin/env bash
         set -xe
         JAR_FILE_WITH_PATH=`realpath $(workspaces.openwhisk-workspace.path)/$(inputs.params.JAR_NAME).jar`
         CONTEXT=`echo "$(inputs.params.OW_RUNTIME_CONTEXT)" | sed 's/^dir:\/\///'`
