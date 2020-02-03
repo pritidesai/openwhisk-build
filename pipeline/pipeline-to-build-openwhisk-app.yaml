@@ -61,7 +61,7 @@ spec:
     - name: OW_RUNTIME_CONTEXT
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
-      default: "dir:///workspace"
+      default: "dir:///workspaces/openwhisk-workspace/runtime-git/"
     - name: OW_BUILD_CONFIG_PATH
       description: "The path to the build configuration script (build.gradle) in Runtime Repo"
       default: "core/java8/proxy/"
