@@ -61,7 +61,7 @@ spec:
     - name: OW_RUNTIME_CONTEXT
       description: "The path to the dockerfile to build from Runtime Repo"
       type: string
-      default: "dir:///workspaces/openwhisk-workspace/runtime-git/"
+      default: "dir:///workspaces/openwhisk-workspace/runtime/"
     - name: OW_BUILD_CONFIG_PATH
       description: "The path to the build configuration script (build.gradle) in Runtime Repo"
       default: "core/java8/proxy/"
@@ -168,10 +168,10 @@ spec:
         - name: OW_ACTION_ARCHIVE_NAME
           value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
-    # Create application JAR with maven
-    - name: create-jar-with-maven
+    # Task to Clone Application Source
+    - name: clone-app-source
       taskRef:
-        name: create-jar-with-maven
+        name: clone-app-repo-to-workspace
       conditions:
         - conditionRef: is-java-runtime
           params:
@@ -187,6 +187,30 @@ spec:
         inputs:
           - name: app-git
             resource: app-git
+    #####################################################################
+    # Task to Clone Runtime Source
+    - name: clone-runtime-source
+      taskRef:
+        name: clone-runtime-repo-to-workspace
+      runAfter:
+        - clone-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+    #####################################################################
+    # Create application JAR with maven
+    - name: create-jar-with-maven
+      taskRef:
+        name: create-jar-with-maven
+      runAfter:
+        - clone-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       params:
         - name: MAVEN_BUILD_OUTPUT_PATH
           value: $(params.MAVEN_BUILD_OUTPUT_PATH)
@@ -198,14 +222,10 @@ spec:
       taskRef:
         name: build-runtime-with-gradle
       runAfter:
-        - create-jar-with-maven
+        - clone-runtime-source
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
-      resources:
-        inputs:
-          - name: runtime-git
-            resource: runtime-git
       params:
         - name: OW_APP_JAVA_VERSION
           value: $(params.OW_APP_JAVA_VERSION)

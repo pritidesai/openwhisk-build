@@ -84,6 +84,12 @@ kubectl $OPERATION -f tasks/javascript/02-build-archive.yaml
 kubectl $OPERATION -f tasks/javascript/03-openwhisk.yaml
 
 # Java Runtime related Tasks
+# Clone Application Source
+kubectl $OPERATION -f tasks/java/00-clone-app-repo.yaml
+
+# Clone Runtime Repo
+kubectl $OPERATION -f tasks/java/00-clone-runtime-repo.yaml
+
 # Create Jar file Task
 kubectl $OPERATION -f tasks/java/01-create-jar-with-maven.yaml
 

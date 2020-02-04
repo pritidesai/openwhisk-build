@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline-workspaces
+spec:
+  workspaces:
+    - name: openwhisk-workspace
+  resources:
+    - name: app-git
+      type: git
+    - name: runtime-git
+      type: git
+  tasks:
+    #####################################################################
+    # Task to Clone Application Source
+    - name: clone-app-source
+      taskRef:
+        name: clone-app-repo-to-workspace
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+    #####################################################################
+    # Task to Clone Runtime Source
+    - name: clone-runtime-source
+      taskRef:
+        name: clone-runtime-repo-to-workspace
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git

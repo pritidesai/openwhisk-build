@@ -6,9 +6,6 @@ spec:
   workspaces:
     - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: app-git
-        type: git
     params:
       - name: JAR_NAME
         default: "OWAutoInit"
@@ -23,7 +20,7 @@ spec:
         - mvn
       args:
         - -f
-        - $(inputs.resources.app-git.path)/
+        - $(workspaces.openwhisk-workspace.path)/application/
         - clean
     - name: maven-package
       image: maven
@@ -31,13 +28,7 @@ spec:
         - mvn
       args:
         - -f
-        - $(inputs.resources.app-git.path)/
+        - $(workspaces.openwhisk-workspace.path)/application/
         - package
         - -DMAVEN_BUILD_OUTPUT_PATH=$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)
         - -DJAR_NAME=$(inputs.params.JAR_NAME)
-    - name: copy-jar-to-openwhisk-workspace
-      image: ubuntu
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        cp $(inputs.resources.app-git.path)/$(inputs.params.JAR_NAME).jar $(workspaces.openwhisk-workspace.path)/
