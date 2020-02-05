@@ -21,7 +21,7 @@ spec:
         echo "INFO: ls $(params.OW_APP_PATH):"
         ls $(params.OW_APP_PATH)
         echo "INFO: Find files with extension .js, sort displays js if one or more files found: "
-        find $(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^js$
+        find $(resources.app-git.path)/$(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^js$
 ---
 
 
@@ -48,7 +48,7 @@ spec:
         echo "INFO: ls $(params.OW_APP_PATH):"
         ls $(params.OW_APP_PATH)
         echo "INFO: Find files with extension .java, sort displays java if one or more files found: "
-        find $(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^java$
+        find $(resources.app-git.path)/$(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^java$
 ---
 
 
@@ -75,4 +75,4 @@ spec:
         echo "INFO: ls $(params.OW_APP_PATH):"
         ls $(params.OW_APP_PATH)
         echo "INFO: Find files with extension .py, sort displays py if one or more files found: "
-        find $(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^py$
+        find $(resources.app-git.path)/$(params.OW_APP_PATH) -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u | grep ^py$

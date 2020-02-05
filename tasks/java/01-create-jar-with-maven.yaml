@@ -3,10 +3,9 @@ kind: Task
 metadata:
   name: create-jar-with-maven
 spec:
+  workspaces:
+    - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: app-git
-        type: git
     params:
       - name: JAR_NAME
         default: "OWAutoInit"
@@ -14,10 +13,6 @@ spec:
       - name: MAVEN_BUILD_OUTPUT_PATH
         default: "./"
         description: "Maven build path where the jar file is created"
-  outputs:
-    resources:
-      - name: app-git
-        type: git
   steps:
     - name: maven-clean
       image: maven:latest
@@ -25,7 +20,7 @@ spec:
         - mvn
       args:
         - -f
-        - $(inputs.resources.app-git.path)/
+        - $(workspaces.openwhisk-workspace.path)/application/
         - clean
     - name: maven-package
       image: maven
@@ -33,25 +28,7 @@ spec:
         - mvn
       args:
         - -f
-        - $(inputs.resources.app-git.path)/
+        - $(workspaces.openwhisk-workspace.path)/application/
         - package
         - -DMAVEN_BUILD_OUTPUT_PATH=$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)
         - -DJAR_NAME=$(inputs.params.JAR_NAME)
-    - name: copy-jar-to-output-workspace
-      image: ubuntu
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        cp -r $(inputs.resources.app-git.path)/* $(outputs.resources.app-git.path)
-    - name: list-out-jar-contents
-      image: "adoptopenjdk/openjdk8-openj9:x86_64-ubuntu-jdk8u222-b10_openj9-0.15.1"
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        jar tf /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar
-    - name: size-of-jar
-      image: ubuntu
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        ls -lh /workspace/app-git/$(inputs.params.MAVEN_BUILD_OUTPUT_PATH)/$(inputs.params.JAR_NAME).jar

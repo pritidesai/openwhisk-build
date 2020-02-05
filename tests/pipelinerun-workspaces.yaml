@@ -1,22 +1,14 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  name: build-app-image
+  name: pipelinerun-workspaces
 spec:
-  serviceAccountName: openwhisk-app-builder
   pipelineRef:
-    name: build-openwhisk-app
+    name: pipeline-workspaces
   workspaces:
     - name: openwhisk-workspace
       persistentVolumeClaim:
         claimName: openwhisk-workspace
-  params:
-    - name: OW_APP_PATH
-      value: "packages/left-pad/"
-    - name: DOCKERFILE
-      value: "core/nodejs10Action/knative/Dockerfile"
-    - name: OW_ACTION_NAME
-      value: "openwhisk-padding-app"
   resources:
     - name: app-git
       resourceSpec:
@@ -30,9 +22,3 @@ spec:
         params:
           - name: url
             value: https://github.com/apache/openwhisk-runtime-nodejs.git
-    - name: app-image
-      resourceSpec:
-        type: image
-        params:
-          - name: url
-            value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
