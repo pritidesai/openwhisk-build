@@ -12,9 +12,9 @@ spec:
         claimName: openwhisk-workspace
   params:
     - name: OW_APP_PATH
-      value: "app-git/packages/left-pad/"
+      value: "packages/left-pad/"
     - name: DOCKERFILE
-      value: "./runtime-git/core/nodejs10Action/knative/Dockerfile"
+      value: "core/nodejs10Action/knative/Dockerfile"
     - name: OW_ACTION_NAME
       value: "openwhisk-padding-app"
   resources:

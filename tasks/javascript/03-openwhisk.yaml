@@ -1,7 +1,6 @@
 # Task to pull OpenWhisk Runtime and update the runtime Dockerfile with an application source
 #
 # Inputs:
-#   * runtime-git: GitHub Repo with an OpenWhisk Runtime
 #   * DOCKERFILE
 #   * OW_RUNTIME_DEBUG
 #   * OW_RUNTIME_PLATFORM
@@ -21,9 +20,6 @@ spec:
   workspaces:
     - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: runtime-git
-        type: git
     params:
       - name: DOCKERFILE
         description: "The path to the dockerfile to build from Runtime Repo"
@@ -66,15 +62,15 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        echo $(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
-        cd $(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
+        echo $(workspaces.openwhisk-workspace.path)/application/$(inputs.params.OW_APP_PATH)
+        cd $(workspaces.openwhisk-workspace.path)/application/$(inputs.params.OW_APP_PATH)
         pwd
         ARCHIVE=$(inputs.params.OW_ACTION_ARCHIVE_NAME)
         echo $ARCHIVE
         base64 $ARCHIVE | tr -d '[:space:]'
         OW_ACTION_CODE=`base64 $ARCHIVE | tr -d '[:space:]'`
         echo $OW_ACTION_CODE
-        cd /workspace/
+        cd $(workspaces.openwhisk-workspace.path)/runtime/
         cat <<EOF >> $(inputs.params.DOCKERFILE)
           ENV __OW_RUNTIME_DEBUG "$(inputs.params.OW_RUNTIME_DEBUG)"
           ENV __OW_RUNTIME_PLATFORM "$(inputs.params.OW_RUNTIME_PLATFORM)"
@@ -93,7 +89,7 @@ spec:
       args:
         - -i
         - -e
-        - 's/COPY ./COPY .\/runtime-git/g'
+        - 's/COPY ./COPY .\/runtime/g'
         - $(inputs.params.DOCKERFILE)
     - name: build-openwhisk-app-image
       image: "gcr.io/kaniko-project/executor:latest"

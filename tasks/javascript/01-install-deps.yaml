@@ -18,9 +18,6 @@ spec:
   workspaces:
     - name: openwhisk-workspace
   inputs:
-    resources:
-      - name: app-git
-        type: git
     params:
       - name: OW_APP_NODE_VERSION
         default: "node"
@@ -36,9 +33,9 @@ spec:
         set -xe
         echo $(inputs.params.OW_APP_PATH)
         if [ -z "$(inputs.params.OW_APP_PATH)" ]; then
-          OW_APP_PATH=$(inputs.resources.app-git.path)
+          OW_APP_PATH=$(workspaces.openwhisk-workspace.path)/application/
         else
-          OW_APP_PATH=$(inputs.params.OW_APP_PATH)
+          OW_APP_PATH=$(workspaces.openwhisk-workspace.path)/application/$(inputs.params.OW_APP_PATH)
         fi
         echo $OW_APP_PATH
         cd $OW_APP_PATH
@@ -49,9 +46,3 @@ spec:
         else
           echo "Failed to install Node Packages under $OW_APP_PATH"
         fi
-    - name: copy-app-git-to-openwhisk-workspace
-      image: ubuntu
-      script: |
-        #!/usr/bin/env bash
-        set -xe
-        cp -avr $(inputs.resources.app-git.path)/ $(workspaces.openwhisk-workspace.path)/

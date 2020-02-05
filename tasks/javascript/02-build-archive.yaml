@@ -32,7 +32,7 @@ spec:
         set -xe
         echo $(inputs.params.OW_APP_PATH)
         apt-get update && apt-get install zip
-        OW_APP_PATH=$(workspaces.openwhisk-workspace.path)/$(inputs.params.OW_APP_PATH)
+        OW_APP_PATH=$(workspaces.openwhisk-workspace.path)/application/$(inputs.params.OW_APP_PATH)
         cd $OW_APP_PATH
         echo "Starting to create an archive under $OW_APP_PATH"
         zip $(inputs.params.OW_ACTION_ARCHIVE_NAME) -r *

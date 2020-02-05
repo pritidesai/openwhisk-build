@@ -86,10 +86,10 @@ spec:
       type: image
   tasks:
     #####################################################################
-    # Task to Clone Application Source and Install necessary Dependencies
-    - name: install-npm-packages
+    # Task to Clone Application Source
+    - name: clone-nodejs-app-source
       taskRef:
-        name: task-install-npm-packages
+        name: clone-app-repo-to-workspace
       conditions:
         - conditionRef: is-nodejs-runtime
           params:
@@ -105,6 +105,30 @@ spec:
         inputs:
           - name: app-git
             resource: app-git
+    #####################################################################
+    # Task to Clone Runtime Source
+    - name: clone-nodejs-runtime-source
+      taskRef:
+        name: clone-runtime-repo-to-workspace
+      runAfter:
+        - clone-nodejs-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+    #####################################################################
+    # Task to Clone Application Source and Install necessary Dependencies
+    - name: install-npm-packages
+      taskRef:
+        name: task-install-npm-packages
+      runAfter:
+        - clone-nodejs-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
       params:
         - name: OW_APP_PATH
           value: $(params.OW_APP_PATH)
@@ -133,14 +157,12 @@ spec:
       taskRef:
         name: openwhisk
       runAfter:
+        - clone-nodejs-runtime-source
         - build-archive
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
       resources:
-        inputs:
-          - name: runtime-git
-            resource: runtime-git
         outputs:
           - name: app-image
             resource: app-image
@@ -169,7 +191,7 @@ spec:
           value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
     # Task to Clone Application Source
-    - name: clone-app-source
+    - name: clone-java-app-source
       taskRef:
         name: clone-app-repo-to-workspace
       conditions:
@@ -189,11 +211,11 @@ spec:
             resource: app-git
     #####################################################################
     # Task to Clone Runtime Source
-    - name: clone-runtime-source
+    - name: clone-java-runtime-source
       taskRef:
         name: clone-runtime-repo-to-workspace
       runAfter:
-        - clone-app-source
+        - clone-java-app-source
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
@@ -207,7 +229,7 @@ spec:
       taskRef:
         name: create-jar-with-maven
       runAfter:
-        - clone-app-source
+        - clone-java-app-source
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
@@ -222,7 +244,7 @@ spec:
       taskRef:
         name: build-runtime-with-gradle
       runAfter:
-        - clone-runtime-source
+        - clone-java-runtime-source
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
