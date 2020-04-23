@@ -15,7 +15,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: openwhisk
+  name: openwhisk-python
 spec:
   workspaces:
     - name: openwhisk-workspace
@@ -67,9 +67,10 @@ spec:
         ARCHIVE=$(params.OW_ACTION_ARCHIVE_NAME)
         echo $ARCHIVE
         base64 $ARCHIVE | tr -d '[:space:]'
-        OW_ACTION_CODE=`base64 $ARCHIVE | tr -d '[:space:]'`
+        OW_ACTION_CODE=`base64 $ARCHIVE | tr -d '[:space:]' | fold | sed -e 's/$/\\\\/g' | sed -e '$s/\\\\$//g'`
         echo $OW_ACTION_CODE
         cd $(workspaces.openwhisk-workspace.path)/runtime/
+        ls $(workspaces.openwhisk-workspace.path)/runtime/
         cat <<EOF >> $(params.DOCKERFILE)
           ENV __OW_RUNTIME_DEBUG "$(params.OW_RUNTIME_DEBUG)"
           ENV __OW_RUNTIME_PLATFORM "$(params.OW_RUNTIME_PLATFORM)"
@@ -83,17 +84,19 @@ spec:
         echo "Done updating Dockerfile"
     - name: update-dockerfile-for-tekton
       image: ubuntu
-      command:
-        - sed
-      args:
-        - -i
-        - -e
-        - 's/COPY ./COPY .\/runtime/g'
-        - $(params.DOCKERFILE)
+      script: |
+        #!/usr/bin/env bash
+        cd openwhisk-workspace
+        pwd
+        ls
+        sed -i -e 's/openwhisk\/dockerskeleton\:1\.14\.0/openwhisk\/dockerskeleton:nightly/g' runtime/$(params.DOCKERFILE)
+        cat runtime/$(params.DOCKERFILE)
     - name: build-openwhisk-app-image
-      image: "gcr.io/kaniko-project/executor:latest"
+      image: "gcr.io/kaniko-project/executor:v0.6.0"
       command:
         - /kaniko/executor
       args:
-        - --dockerfile=$(params.DOCKERFILE)
+        - --verbosity=debug
+        - --dockerfile=Dockerfile
         - --destination=$(outputs.resources.app-image.url)
+        - --context=dir://$(workspaces.openwhisk-workspace.path)/runtime/core/python3Action/

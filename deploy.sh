@@ -89,6 +89,16 @@ kubectl $OPERATION -f tasks/javascript/02-build-archive.yaml
 # Create OpenWhisk Task
 kubectl $OPERATION -f tasks/javascript/03-openwhisk.yaml
 
+# Python Runtime related Tasks
+# Create Install Deps Task
+kubectl $OPERATION -f tasks/python/01-install-deps.yaml
+
+# Create Build Archive Task
+kubectl $OPERATION -f tasks/python/02-build-archive.yaml
+
+# Create OpenWhisk Task
+kubectl $OPERATION -f tasks/python/03-openwhisk.yaml
+
 # Java Runtime related Tasks
 # Create Jar file Task
 kubectl $OPERATION -f tasks/java/01-create-jar-with-maven.yaml

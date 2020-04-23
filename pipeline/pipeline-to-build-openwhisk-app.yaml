@@ -14,6 +14,9 @@ spec:
       description: "Any specific Node version needed to compile/run application source on"
       type: string
       default: "node"
+    - name: OW_APP_PYTHON_VERSION
+      description: "Any specific Python version needed to compile/run application source on"
+      default: "python"
     - name: OW_ACTION_ARCHIVE_NAME
       type: string
       default: "action.zip"
@@ -136,7 +139,7 @@ spec:
           value: $(params.OW_APP_NODE_VERSION)
     #####################################################################
     # Task to archive application source
-    - name: build-archive
+    - name: build-archive-node
       taskRef:
         name: task-build-archive
       runAfter:
@@ -153,12 +156,116 @@ spec:
           value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
     # Task to build an image with OpenWhisk Runtime and Application Source
-    - name: build-openwhisk-app-image
+    - name: build-openwhisk-app-image-node
       taskRef:
         name: openwhisk
       runAfter:
         - clone-nodejs-runtime-source
-        - build-archive
+        - build-archive-node
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        outputs:
+          - name: app-image
+            resource: app-image
+      params:
+        - name: DOCKERFILE
+          value: $(params.DOCKERFILE)
+        - name: OW_RUNTIME_DEBUG
+          value: $(params.OW_RUNTIME_DEBUG)
+        - name: OW_RUNTIME_PLATFORM
+          value: $(params.OW_RUNTIME_PLATFORM)
+        - name: OW_ACTION_NAME
+          value: $(params.OW_ACTION_NAME)
+        - name: OW_ACTION_CODE
+          value: $(params.OW_ACTION_CODE)
+        - name: OW_ACTION_MAIN
+          value: $(params.OW_ACTION_MAIN)
+        - name: OW_ACTION_BINARY
+          value: $(params.OW_ACTION_BINARY)
+        - name: OW_HTTP_METHODS
+          value: $(params.OW_HTTP_METHODS)
+        - name: OW_ACTION_RAW
+          value: $(params.OW_ACTION_RAW)
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
+        - name: OW_ACTION_ARCHIVE_NAME
+          value: $(params.OW_ACTION_ARCHIVE_NAME)
+    #####################################################################
+    # Task to Clone Application Source
+    - name: clone-python-app-source
+      taskRef:
+        name: clone-app-repo-to-workspace
+      conditions:
+        - conditionRef: is-python-runtime
+          params:
+            - name: OW_APP_PATH
+              value: $(params.OW_APP_PATH)
+          resources:
+            - name: app-git
+              resource: app-git
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: app-git
+            resource: app-git
+    #####################################################################
+    # Task to Clone Runtime Source
+    - name: clone-python-runtime-source
+      taskRef:
+        name: clone-runtime-repo-to-workspace
+      runAfter:
+        - clone-python-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      resources:
+        inputs:
+          - name: runtime-git
+            resource: runtime-git
+    #####################################################################
+    # Task to Clone Application Source and Install necessary Dependencies
+    - name: install-pip-packages
+      taskRef:
+        name: task-install-pip-packages
+      runAfter:
+        - clone-python-app-source
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      params:
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
+        - name: OW_APP_PYTHON_VERSION
+          value: $(params.OW_APP_PYTHON_VERSION)
+    #####################################################################
+    # Task to archive application source
+    - name: build-archive-python
+      taskRef:
+        name: task-build-archive-python
+      runAfter:
+        - install-pip-packages
+      workspaces:
+        - name: openwhisk-workspace
+          workspace: openwhisk-workspace
+      params:
+        - name: OW_APP_PATH
+          value: $(params.OW_APP_PATH)
+        - name: OW_APP_PYTHON_VERSION
+          value: $(params.OW_APP_PYTHON_VERSION)
+        - name: OW_ACTION_ARCHIVE_NAME
+          value: $(params.OW_ACTION_ARCHIVE_NAME)
+    #####################################################################
+    # Task to build an image with OpenWhisk Runtime and Application Source
+    - name: build-openwhisk-app-image-python
+      taskRef:
+        name: openwhisk-python
+      runAfter:
+        - clone-python-runtime-source
+        - build-archive-python
       workspaces:
         - name: openwhisk-workspace
           workspace: openwhisk-workspace
