@@ -16,9 +16,7 @@ spec:
     - name: DOCKERFILE
       value: "core/python3Action/Dockerfile"
     - name: OW_ACTION_NAME
-      value: "openwhisk-padding-app"
-    - name: OW_ACTION_MAIN
-      value: "joke"
+      value: "openwhisk-joke-app"
   resources:
     - name: app-git
       resourceSpec:
@@ -37,4 +35,4 @@ spec:
         type: image
         params:
           - name: url
-            value: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app
+            value: docker.io/${DOCKER_USERNAME}/openwhisk-jokes-app
