@@ -12,11 +12,11 @@ spec:
         claimName: openwhisk-workspace
   params:
     - name: OW_APP_PATH
-      value: ""
+      value: "packages/helloMorse/"
     - name: DOCKERFILE
       value: "core/python3Action/Dockerfile"
     - name: OW_ACTION_NAME
-      value: "openwhisk-joke-app"
+      value: "openwhisk-morse-hello-app"
   resources:
     - name: app-git
       resourceSpec:
@@ -35,4 +35,4 @@ spec:
         type: image
         params:
           - name: url
-            value: docker.io/${DOCKER_USERNAME}/openwhisk-jokes-app
+            value: docker.io/${DOCKER_USERNAME}/openwhisk-morse-hello-app

@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
-  name: openwhisk-javascript-app
+  name: openwhisk-morse-hello-app
   namespace: default
 spec:
   runLatest:
@@ -9,4 +9,4 @@ spec:
       revisionTemplate:
         spec:
           container:
-            image: docker.io/${DOCKER_USERNAME}/openwhisk-padding-app:latest
+            image: docker.io/${DOCKER_USERNAME}/openwhisk-morse-hello-app:latest
