@@ -1,12 +1,12 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: clone-runtime-repo-to-workspace
 spec:
   workspaces:
     - name: openwhisk-workspace
-  inputs:
-    resources:
+  resources:
+    inputs:
       - name: runtime-git
         type: git
         targetPath: runtime
@@ -16,4 +16,4 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        cp -avr $(inputs.resources.runtime-git.path)/ $(workspaces.openwhisk-workspace.path)/
+        cp -avr $(resources.inputs.runtime-git.path)/ $(workspaces.openwhisk-workspace.path)/

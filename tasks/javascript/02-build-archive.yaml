@@ -9,7 +9,7 @@
 #
 # This task creates archive with everything from the application path
 #
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: task-build-archive

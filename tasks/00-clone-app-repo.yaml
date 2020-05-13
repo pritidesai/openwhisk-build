@@ -1,12 +1,12 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: clone-app-repo-to-workspace
 spec:
   workspaces:
     - name: openwhisk-workspace
-  inputs:
-    resources:
+  resources:
+    inputs:
       - name: app-git
         type: git
         targetPath: application
@@ -16,4 +16,4 @@ spec:
       script: |
         #!/usr/bin/env bash
         set -xe
-        cp -avr $(inputs.resources.app-git.path)/ $(workspaces.openwhisk-workspace.path)/
+        cp -avr $(resources.inputs.app-git.path)/ $(workspaces.openwhisk-workspace.path)/
