@@ -10,7 +10,7 @@
 #
 # This task installs third party packages under /workspace/<resource-name>/<app_path>/
 #
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: task-install-pip-packages

@@ -12,7 +12,7 @@
 # Outputs:
 #   * app-image: An image with OpenWhisk Runtime and application source which is ready to be served on Knative
 #
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: openwhisk
@@ -51,8 +51,8 @@ spec:
       default: ""
     - name: OW_ACTION_ARCHIVE_NAME
       default: "action.zip"
-  outputs:
-    resources:
+  resources:
+    outputs:
       - name: app-image
         type: image
   steps:
@@ -96,4 +96,4 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.DOCKERFILE)
-        - --destination=$(outputs.resources.app-image.url)
+        - --destination=$(resources.outputs.app-image.url)

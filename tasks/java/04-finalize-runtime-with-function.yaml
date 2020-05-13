@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: finalize-runtime-with-function
@@ -24,8 +24,8 @@ spec:
     - name: MAVEN_BUILD_OUTPUT_PATH
       default: "./"
       description: "Maven build path where the jar file is created"
-  outputs:
-    resources:
+  resources:
+    outputs:
       - name: app-image
         type: image
   steps:
@@ -67,4 +67,4 @@ spec:
       args:
         - --context=$(params.OW_RUNTIME_CONTEXT)
         - --dockerfile=$(params.DOCKERFILE)
-        - --destination=$(outputs.resources.app-image.url)
+        - --destination=$(resources.outputs.app-image.url)

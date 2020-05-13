@@ -224,6 +224,6 @@ kubectl apply -f service/service-openwhisk-javascript-app.yaml
 Run OpenWhisk NodeJS Application service:
 
 ```shell script
-curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost:32319/
+curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
 {"padded":[".........................Hello","..................How are you?"]}
 ```
