@@ -31,9 +31,21 @@ All dependent resources required by the pipeline can be installed using the sing
 
 Follow these instructions to install the pipeline resources:
 
-### Set required environment variables
+### Set Docker environment variables
 
 The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
+
+```bash
+export DOCKER_USERNAME=<my_dockerhub_username>
+export DOCKER_PASSWORD=<my_dockerhub_password>
+```
+
+verify variables are set:
+
+```bash
+printenv DOCKER_USERNAME
+printenv DOCKER_PASSWORD
+```
 
 ### Run the deploy script
 
