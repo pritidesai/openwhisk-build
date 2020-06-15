@@ -23,6 +23,49 @@ In general, these common tasks provide the following logical steps:
 6. Push image to target image repo.
     - *Optionally, add OpenWhisk context to environment variables.*
 
+## Installing the pipeline
+
+The `Pipeline` is defined in the Kubernetes-style YAML file:  [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml).  It includes reference to the shared `Workspace` called "openwhisk-workspace" and all referenced `PipelineResources` and `Tasks`.
+
+All dependent resources required by the pipeline can be installed using the single "[deploy.sh](deploy.sh)" script located in the root of the `openwhisk` directory.
+
+Follow these instructions to install the pipeline resources:
+
+### Set required environment variables
+
+The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
+
+### Run the deploy script
+
+Deploy all `Pipeline resources using the [deploy.sh](deploy.sh) script using the following command:
+
+```shell script
+./deploy.sh
+```
+
+You should see all resource successfully created:
+```shell script
+secret/dockerhub-user-pass created
+serviceaccount/openwhisk-app-builder created
+condition.tekton.dev/is-nodejs-runtime created
+condition.tekton.dev/is-java-runtime created
+condition.tekton.dev/is-python-runtime created
+persistentvolumeclaim/openwhisk-workspace created
+task.tekton.dev/clone-app-repo-to-workspace created
+task.tekton.dev/clone-runtime-repo-to-workspace created
+task.tekton.dev/task-install-npm-packages created
+task.tekton.dev/task-build-archive created
+task.tekton.dev/openwhisk created
+task.tekton.dev/task-install-pip-packages created
+task.tekton.dev/task-build-archive-python created
+task.tekton.dev/openwhisk-python created
+task.tekton.dev/create-jar-with-maven created
+task.tekton.dev/build-runtime-with-gradle created
+task.tekton.dev/build-shared-class-cache created
+task.tekton.dev/finalize-runtime-with-function created
+pipeline.tekton.dev/build-openwhisk-app created
+```
+
 ## Building OpenWhisk Applications using the pipeline
 
 Currently, the pipeline supports building containers for the following popular OpenWhisk languages:
@@ -48,7 +91,6 @@ In this section sections, we will describe the customized resources and tasks fo
 - [Python](#python)
 - [Java](#java)
 
-
 In addition, each language will include a set of simple instructions to create a sample application using the pipeline that you can try yourself.
 
 ---
@@ -68,36 +110,6 @@ from an open GitHub repo and download a list of dependencies specified in the `p
 OpenWhisk runtime and build/publish an image.
 
 * Use Knative Serving to deploy the finalized image on Knative.
-
-This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
-pipeline run in [pipelinerun-javascript.yaml.tmpl](pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl) to execute the pipeline.
-
-Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh) if not already done:
-
-[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
-
-```shell script
-./deploy.sh
-secret/dockerhub-user-pass created
-serviceaccount/openwhisk-app-builder created
-condition.tekton.dev/is-nodejs-runtime created
-condition.tekton.dev/is-java-runtime created
-condition.tekton.dev/is-python-runtime created
-persistentvolumeclaim/openwhisk-workspace created
-task.tekton.dev/clone-app-repo-to-workspace created
-task.tekton.dev/clone-runtime-repo-to-workspace created
-task.tekton.dev/task-install-npm-packages created
-task.tekton.dev/task-build-archive created
-task.tekton.dev/openwhisk created
-task.tekton.dev/task-install-pip-packages created
-task.tekton.dev/task-build-archive-python created
-task.tekton.dev/openwhisk-python created
-task.tekton.dev/create-jar-with-maven created
-task.tekton.dev/build-runtime-with-gradle created
-task.tekton.dev/build-shared-class-cache created
-task.tekton.dev/finalize-runtime-with-function created
-pipeline.tekton.dev/build-openwhisk-app created
-```
 
 ![NodeJS pipeline resources](images/pipeline-customized-for-nodejs.png)
 
