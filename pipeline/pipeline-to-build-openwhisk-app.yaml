@@ -89,6 +89,18 @@ spec:
       type: image
   tasks:
     #####################################################################
+    # Javascript (NodeJS) Tasks
+    # - clone-nodejs-app-source (clone-app-repo-to-workspace)
+    #     - Task to Clone Application Source
+    # - clone-nodejs-runtime-source (clone-runtime-repo-to-workspace)
+    #     - Task to Clone Runtime Source
+    # - install-npm-packages (task-install-npm-packages)
+    #     - Task to Clone Application Source and Install necessary Dependencies
+    # - build-archive-node (task-build-archive)
+    #     - Task to archive application source
+    # - build-openwhisk-app-image-node (openwhisk)
+    #     - Task to build an image with OpenWhisk Runtime and Application Source
+    #####################################################################
     # Task to Clone Application Source
     - name: clone-nodejs-app-source
       taskRef:
@@ -158,7 +170,7 @@ spec:
     # Task to build an image with OpenWhisk Runtime and Application Source
     - name: build-openwhisk-app-image-node
       taskRef:
-        name: openwhisk
+        name: openwhisk-node
       runAfter:
         - clone-nodejs-runtime-source
         - build-archive-node
@@ -192,6 +204,18 @@ spec:
           value: $(params.OW_APP_PATH)
         - name: OW_ACTION_ARCHIVE_NAME
           value: $(params.OW_ACTION_ARCHIVE_NAME)
+    #####################################################################
+    # Python Tasks
+    # - clone-python-app-source (clone-app-repo-to-workspace)
+    #     - Task to Clone Application Source
+    # - clone-python-runtime-source (clone-runtime-repo-to-workspace)
+    #     - Task to Clone Runtime Source
+    # - install-pip-packages (task-install-npm-packages)
+    #     - Task to Clone Application Source and Install necessary Dependencies
+    # - build-archive-python (task-build-archive)
+    #     - Task to archive application source
+    # - build-openwhisk-app-image-python (openwhisk)
+    #     - Task to build an image with OpenWhisk Runtime and Application Source
     #####################################################################
     # Task to Clone Application Source
     - name: clone-python-app-source
@@ -297,6 +321,20 @@ spec:
         - name: OW_ACTION_ARCHIVE_NAME
           value: $(params.OW_ACTION_ARCHIVE_NAME)
     #####################################################################
+    # Java Tasks
+    # - clone-java-app-source (clone-app-repo-to-workspace)
+    #     - Task to Clone Application Source
+    # - clone-java-runtime-source (clone-runtime-repo-to-workspace)
+    #     - Task to Clone Runtime Source
+    # - create-jar-with-maven (create-jar-with-maven)
+    #     - Create application JAR with maven
+    # - build-runtime-with-gradle (build-runtime-with-gradle)
+    #     - Build runtime with gradle, run after creating application JAR
+    # - build-shared-class-cache (build-shared-class-cache)
+    #     - Build shared class cache, run after building runtime
+    # - finalize-runtime-with-function (finalize-runtime-with-function)
+    #     - Finalize runtime with function (JAR file) after building shared class cache
+    #####################################################################
     # Task to Clone Application Source
     - name: clone-java-app-source
       taskRef:
@@ -376,7 +414,7 @@ spec:
         - name: OW_BUILD_CONFIG_PATH
           value: $(params.OW_BUILD_CONFIG_PATH)
     #####################################################################
-    # Finalize runtime with function source - JAR file, run after building shared class cache
+    # Finalize runtime with function (JAR file) after building shared class cache
     - name: finalize-runtime-with-function
       taskRef:
         name: finalize-runtime-with-function

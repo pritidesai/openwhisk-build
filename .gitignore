@@ -1,0 +1,33 @@
+##############################################
+# Artifacts created by OS/editors/IDEs
+##############################################
+
+# OS X
+**/.DS_Store
+
+# Go IDE
+*.iml
+.idea
+.project
+.settings
+.vscode
+Packages/
+
+# emacs
+*.elc
+*.rel
+.projectile
+.org-id-locations
+.dir-locals.el
+auto-save-list
+tramp
+
+##############################################
+# Artifacts created by running samples
+##############################################
+docker-secret.yaml
+
+# Gradle
+.gradle
+build/
+bin/

@@ -1,6 +1,37 @@
-## Building OpenWhisk Application with Tekton for Knative
+# OpenWhisk Application pipeline for Knative
 
-## Java
+*This catalog offering provides a single pipeline that can be used to build either [Apache OpenWhisk](https://openwhisk.apache.org/) or [Knative](https://openwhisk.apache.org/) compatible containers for supported runtimes used to execute OpenWhisk serverless functions.*
+
+As background, the [Apache OpenWhisk project](https://openwhisk.apache.org/) provides a robust implementation of a  Function-as-a-Service (FaaS) platform to run serverless applications written in any functional language.
+
+The project provides a set of [supported language runtimes](https://openwhisk.apache.org/downloads.html#component-releases) that includes a proxy enforces a documented contract for function initialization (function injection) and execution along with a standard context. Several of these runtimes, such as NodeJS, Python and Java, have been updated to support execution on as containers on either OpenWhisk or [Knative](https://openwhisk.apache.org/) clusters. In the latter case, the resultant containers can be run as on Knative without requiring an OpenWhisk control plane.
+
+## Pipeline resources
+
+The pipeline also uses a consistent series of tasks to perform similar functional steps for each language.  Each supported language has a series of language-specific task implementations that all appear as their own branch of the pipeline.
+
+In general, these common tasks provide the following logical steps:
+
+![Java Pipeline](java-pipeline.jpg)
+
+1.
+2.
+3.
+4.
+
+The pipeline also uses a consistent series of tasks to perform similar functional steps for each language.  Each supported language has a series of language-specific task implementations that all appear as their own branch of the pipeline.
+
+## Building OpenWhisk Applications using the pipeline
+
+Currently, the pipeline supports building containers for the following popular OpenWhisk languages:
+
+- NodeJS
+- Python
+- Java
+
+In the following sections, we will describe the unique tasks that are used for each of the language
+
+### Java
 
 In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an image with OpenWhisk Java Runtime serving an application source from GitHub repo.
 
@@ -25,7 +56,7 @@ Jar into the OpenWhisk runtime and build/publish an image.
 ![Java Pipeline](java-pipeline.jpg)
 
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
-pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.  
+pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.
 
 Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh):
 
@@ -109,8 +140,8 @@ STARTED      DURATION    STATUS
 Create a new service on Knative with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service/service-openwhisk-java-app.yaml.tmpl > service/service-openwhisk-java-app.yaml
-kubectl apply -f service/service-openwhisk-java-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-java-app.yaml.tmpl > services/service-openwhisk-java-app.yaml
+kubectl apply -f services/service-openwhisk-java-app.yaml
 ```
 
 Run OpenWhisk Java Application service with few different images:
@@ -232,8 +263,8 @@ STARTED        DURATION     STATUS
 Create a new service on Knative with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service/service-openwhisk-javascript-app.yaml.tmpl > service/service-openwhisk-javascript-app.yaml
-kubectl apply -f service/service-openwhisk-javascript-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-javascript-app.yaml.tmpl > services/service-openwhisk-javascript-app.yaml
+kubectl apply -f services/service-openwhisk-javascript-app.yaml
 ```
 
 Run OpenWhisk NodeJS Application service:
@@ -340,8 +371,8 @@ STARTED      DURATION    STATUS
 Create a new service on Knative with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service/service-openwhisk-python-app.yaml.tmpl > service/service-openwhisk-python-app.yaml
-kubectl apply -f service/service-openwhisk-python-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-python-app.yaml.tmpl > services/service-openwhisk-python-app.yaml
+kubectl apply -f services/service-openwhisk-python-app.yaml
 ```
 
 Run OpenWhisk NodeJS Application service:

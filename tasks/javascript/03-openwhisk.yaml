@@ -15,7 +15,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: openwhisk
+  name: openwhisk-node
 spec:
   workspaces:
     - name: openwhisk-workspace
