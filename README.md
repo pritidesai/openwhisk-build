@@ -80,36 +80,24 @@ pipeline.tekton.dev/build-openwhisk-app created
 
 ## Building OpenWhisk Applications using the pipeline
 
-Currently, the pipeline supports building containers for the following popular OpenWhisk languages:
+In this section, we will describe how to use the pipeline to build and deploy Serverless application images for the following popular OpenWhisk languages using some sample functions:
 
 - [NodeJS](#nodejs)
 - [Python](#python)
 - [Java](#java)
 
-The pipeline can be configured to produce a Serverless application image that is compatible with:
+In addition, we will show how to confugre the pipeline to produce a Serverless application image that is compatible with:
 
-- [Knative](https://knative.dev/)
+- [Knative](https://knative.dev/) (default)
 - [Apache OpenWhisk](https://openwhisk.apache.org/)
 - [Project Coligo](https://cloud.ibm.com/docs/knative?topic=knative-kn-faqs)
     - *An IBM experimental Knative-based container platform*
 
-##
-
-## Language customizations
-
-In this section sections, we will describe the customized resources and tasks for each of the supported languages:
-
-- [NodeJS](#nodejs)
-- [Python](#python)
-- [Java](#java)
-
-In addition, each language will include a set of simple instructions to create a sample application using the pipeline that you can try yourself.
-
----
-
-## Building Serverless Applications using the pipeline
-
 ### NodeJS
+
+#### Custom Tasks
+
+The `Pipeline` includes the following customized `Tasks`  specific to NodeJS:
 
 Here is the list of `Tasks` created:
 
@@ -193,7 +181,9 @@ curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-d
 
 ### Python
 
-Here is the list of `Tasks` created:
+#### Custom Tasks
+
+The `Pipeline` includes the following customized `Tasks`  specific to Python:
 
 * [01-install-deps.yaml](tasks/javascript/01-install-deps.yaml) - Pull NodeJS Application source with an OpenWhisk action
 from an open GitHub repo and download a list of dependencies specified in the `package.json` file.
@@ -209,33 +199,6 @@ This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipel
 pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.
 
 ![Python pipeline resources](images/pipeline-customized-for-python.png)
-
-Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh) if not already done:
-
-[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
-
-```shell script
-./deploy.sh
-secret/dockerhub-user-pass created
-serviceaccount/openwhisk-app-builder created
-condition.tekton.dev/is-nodejs-runtime created
-condition.tekton.dev/is-java-runtime created
-condition.tekton.dev/is-python-runtime created
-persistentvolumeclaim/openwhisk-workspace created
-task.tekton.dev/clone-app-repo-to-workspace created
-task.tekton.dev/clone-runtime-repo-to-workspace created
-task.tekton.dev/task-install-npm-packages created
-task.tekton.dev/task-build-archive created
-task.tekton.dev/openwhisk created
-task.tekton.dev/task-install-pip-packages created
-task.tekton.dev/task-build-archive-python created
-task.tekton.dev/openwhisk-python created
-task.tekton.dev/create-jar-with-maven created
-task.tekton.dev/build-runtime-with-gradle created
-task.tekton.dev/build-shared-class-cache created
-task.tekton.dev/finalize-runtime-with-function created
-pipeline.tekton.dev/build-openwhisk-app created
-```
 
 Execute `PipelineRun` with:
 
@@ -307,7 +270,9 @@ curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-
 
 In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an image with OpenWhisk Java Runtime serving an application source from GitHub repo.
 
-Here is the list of `Tasks` created:
+#### Custom Tasks
+
+The `Pipeline` includes the following customized `Tasks`  specific to Java:
 
 * [01-create-jar-with-maven.yaml](tasks/java/01-create-jar-with-maven.yaml) - Pull Java Application with an OpenWhisk action
 from an open GitHub repo, with java action taking an image and converting it into gray image. Compile the source code
@@ -327,32 +292,6 @@ Jar into the OpenWhisk runtime and build/publish an image.
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.
 
-Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh):
-
-[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
-
-```shell script
-./deploy.sh
-secret/dockerhub-user-pass created
-serviceaccount/openwhisk-app-builder created
-condition.tekton.dev/is-nodejs-runtime created
-condition.tekton.dev/is-java-runtime created
-condition.tekton.dev/is-python-runtime created
-persistentvolumeclaim/openwhisk-workspace created
-task.tekton.dev/clone-app-repo-to-workspace created
-task.tekton.dev/clone-runtime-repo-to-workspace created
-task.tekton.dev/task-install-npm-packages created
-task.tekton.dev/task-build-archive created
-task.tekton.dev/openwhisk created
-task.tekton.dev/task-install-pip-packages created
-task.tekton.dev/task-build-archive-python created
-task.tekton.dev/openwhisk-python created
-task.tekton.dev/create-jar-with-maven created
-task.tekton.dev/build-runtime-with-gradle created
-task.tekton.dev/build-shared-class-cache created
-task.tekton.dev/finalize-runtime-with-function created
-pipeline.tekton.dev/build-openwhisk-app created
-```
 
 ![Java pipeline resources](images/pipeline-customized-for-java.png)
 
