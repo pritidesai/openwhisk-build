@@ -48,7 +48,12 @@ In this section sections, we will describe the customized resources and tasks fo
 - [Python](#python)
 - [Java](#java)
 
+
+In addition, each language will include a set of simple instructions to create a sample application using the pipeline that you can try yourself.
+
 ---
+
+## Building Serverless Applications using the pipeline
 
 ### NodeJS
 
@@ -93,6 +98,8 @@ task.tekton.dev/build-shared-class-cache created
 task.tekton.dev/finalize-runtime-with-function created
 pipeline.tekton.dev/build-openwhisk-app created
 ```
+
+![NodeJS pipeline resources](images/pipeline-customized-for-nodejs.png)
 
 Execute `PipelineRun` with:
 
@@ -176,6 +183,8 @@ OpenWhisk runtime and build/publish an image.
 
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.
+
+![Python pipeline resources](images/pipeline-customized-for-python.png)
 
 Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh) if not already done:
 
@@ -291,8 +300,6 @@ Jar into the OpenWhisk runtime and build/publish an image.
 
 * Use Knative Serving to deploy the finalized image on Knative.
 
-![Java Pipeline](java-pipeline.jpg)
-
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.
 
@@ -322,6 +329,8 @@ task.tekton.dev/build-shared-class-cache created
 task.tekton.dev/finalize-runtime-with-function created
 pipeline.tekton.dev/build-openwhisk-app created
 ```
+
+![Java pipeline resources](images/pipeline-customized-for-java.png)
 
 Execute `PipelineRun` with:
 
@@ -401,3 +410,13 @@ curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$
 ```
 
 ![03-eclipsecon-2019.png](images/03-eclipsecon-2019.png) => ![03-eclipsecon-2019-gray.png](images/03-eclipsecon-2019-gray.png)
+
+#### Java pipeline vision
+
+It is the goal of this pipeline to provide further optimizations via additional tasks.
+
+The following diagram shows at a high level the envisioned tasks:
+
+![Java Pipeline](java-pipeline.jpg)
+
+We welcome any Java developers who may wish to help us create and improve the tasks and their steps to help realize this vision!
