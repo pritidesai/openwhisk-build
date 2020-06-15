@@ -33,15 +33,24 @@ Currently, the pipeline supports building containers for the following popular O
 
 The pipeline can be configured to produce a Serverless application image that is compatible with:
 
-- Knative
-- OpenWhiks
-- IBM Coligo *(experimental Knative-based container platform)*
+- [Knative](https://knative.dev/)
+- [Apache OpenWhisk](https://openwhisk.apache.org/)
+- [Project Coligo](https://cloud.ibm.com/docs/knative?topic=knative-kn-faqs)
+    - *An IBM experimental Knative-based container platform*
 
-In the following sections, we will describe the unique tasks that are used for each of the supported languages.
+##
+
+## Language customizations
+
+In this section sections, we will describe the customized resources and tasks for each of the supported languages:
+
+- [NodeJS](#nodejs)
+- [Python](#python)
+- [Java](#java)
 
 ---
 
-## NodeJS
+### NodeJS
 
 Here is the list of `Tasks` created:
 
@@ -151,7 +160,7 @@ curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-d
 ```
 ---
 
-## Python
+### Python
 
 Here is the list of `Tasks` created:
 
@@ -260,7 +269,8 @@ curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-
 ```
 
 ---
-### Java
+
+#### Java
 
 In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an image with OpenWhisk Java Runtime serving an application source from GitHub repo.
 
