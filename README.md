@@ -200,9 +200,13 @@ The `Pipeline` includes the following customized `Tasks` specific to NodeJS that
 
 * [openwhisk-node](tasks/javascript/03-openwhisk.yaml) - Inject NodeJS application archive built in previous task into the OpenWhisk runtime and build/publish an image.
 
+These tasks are only executed if the `Condition` named `is-nodejs-runtime` returns a `true` value.  Effectively, the NodeJS tasks are considered a NodeJS-specific branch within the general pipeline.
+
 ![NodeJS pipeline resources](images/pipeline-customized-for-nodejs.png)
 
 #### Running the NodeJS example
+
+The `PipelineRun` resource used to build a Python application is derived from the template file named [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl).
 
 1. Execute `PipelineRun` with:
 
@@ -285,7 +289,7 @@ The `Pipeline` includes the following customized `Tasks` specific to NodeJS that
 
 #### Python Custom Tasks
 
-The `Pipeline` includes the following customized `Tasks` specific to Python that were installed with the [deploy.sh](deploy.sh) script:
+The `Pipeline` includes the following customized `Tasks` specific to Python that were installed with the [deploy.sh](deploy.sh) script.
 
 * [task-install-pip-packages](tasks/python/01-install-deps.yaml) - Pull Python Application source with an OpenWhisk action from an open GitHub repo and download a list of dependencies specified in the `requirements.txt` file.
 
@@ -293,12 +297,17 @@ The `Pipeline` includes the following customized `Tasks` specific to Python that
 
 * [openwhisk-python](tasks/python/03-openwhisk.yaml) - Inject Python application archive built in previous task into the OpenWhisk runtime and build/publish an image.
 
-This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
-pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.
+These tasks are only executed if the `Condition` named `is-python-runtime` returns a `true` value.  Effectively, the Python tasks are considered a Python-specific branch within the general pipeline.
 
 ![Python pipeline resources](images/pipeline-customized-for-python.png)
 
 #### Running the Python example
+
+The `PipelineRun` resource used to build a Python application is derived from the template file named [pipelinerun-python.yaml.tmpl](pipelinerun/python/pipelinerun-python.yaml.tmpl).
+
+<!-- WHAT IS THIS FILE?????
+[pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/python/pipelinerun-build-padding-app.yaml.tmpl).
+-->
 
 1. Execute `PipelineRun` with:
 
@@ -402,12 +411,13 @@ create Java Shared Class Cache for proxy.
 * [04-finalize-runtime-with-function.yaml](tasks/java/04-finalize-runtime-with-function.yaml) - Inject Java application
 Jar into the OpenWhisk runtime and build/publish an image.
 
-This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
-pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.
+These tasks are only executed if the `Condition` named `is-java-runtime` returns a `true` value.  Effectively, the Java tasks are considered a Java-specific branch within the general pipeline.
 
 ![Java pipeline resources](images/pipeline-customized-for-java.png)
 
 #### Running the Java example
+
+The `PipelineRun` resource used to build a Java application is derived from the template file named [pipelinerun-java.yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl).
 
 1. Execute `PipelineRun` with:
 
