@@ -23,7 +23,53 @@ In general, these common tasks provide the following logical steps:
 6. Push image to target image repo.
     - *Optionally, add OpenWhisk context to environment variables.*
 
-## Installing the pipeline
+## Running the pipeline
+
+### Prerequisites
+
+This pipeline and all examples were tested using the following prerequisite software and listed versions:
+
+- [x] [Tekton Pipeline](https://github.com/tektoncd/pipeline/blob/master/docs/install.md#installing-tekton-pipelines) v1beta1
+- [x] [Kubernetes](https://kubernetes.io/docs/home/#learn-how-to-use-kubernetes) v1.15.5
+- [x] [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.15.5
+- [x] [Knative Serving](https://knative.dev/docs/install/any-kubernetes-cluster/) 0.9.0 *(for running examples)*
+
+Specifically, for development and testing on Mac OS, the following components and versions were used:
+
+- [x] [Docker Desktop for Mac Docker Community Edition 2.2.0.5](https://www.docker.com/get-started) (stable)
+    - which includes Kubernetes 1.15.5
+
+#### Docker Desktop resources
+
+If using Docker Desktop, verify in the Docker Desktop menu dropdown that you see "Kubernetes is running". If not, then enable it by selecting **Preferences** -> **Kubernetes**  and check "enable" then wait for it to start.
+
+Further verify that you have allocated enough resources to run all sample applications by selecting **Preferences** -> **Resources** -> **Advanced**.  The following settings were used for testing all examples:
+
+- [x] **CPUs: 6**
+- [x] **Memory: 8.0 GiB**
+- [x] **Swap: 1.5 GiB**
+
+#### Verify your Kubernetes node is ready
+
+```
+$ kubectl get nodes
+
+NAME             STATUS    ROLES     AGE       VERSION
+docker-desktop   Ready     master    4d22h     v1.15.5
+```
+
+#### Verify Kubernetes Installation
+
+Use the following command to verify the Kubernetes **Server Version**:
+
+```bash
+$ kubectl version
+
+Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:07:57Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"linux/amd64"}
+```
+
+## Installing pipeline resources
 
 The `Pipeline` is defined in the Kubernetes-style YAML file:  [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml).  It includes reference to the shared `Workspace` called "openwhisk-workspace" and all referenced `PipelineResources` and `Tasks`.
 
