@@ -61,7 +61,7 @@ Further verify that you have allocated enough resources to run all sample applic
     ```
 
 2. Verify client and server versions
-</br>
+    </br>
     ```bash
     $ kubectl version
     ```
@@ -72,15 +72,13 @@ Further verify that you have allocated enough resources to run all sample applic
     ```
 
 3. Verify Kubernetes and Tekton pipeline pods are running
-<br>
+    <br>
+
     ```bash
     $ kubectl get pods --namespace kube-system
     ```
     <details>
     <summary>Example results:</summary>
-    ```bash
-    $ kubectl get pods --namespace kube-system
-    ```
 
     ```bash
     NAME                                     READY   STATUS    RESTARTS   AGE
@@ -120,55 +118,62 @@ All dependent resources required by the pipeline can be installed using the sing
 
 Follow these instructions to install the pipeline resources:
 
-### Set Docker environment variables
+1. Set Docker environment variables
 
-The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
+    </br>The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
+    </br>
 
-```bash
-export DOCKER_USERNAME=<my_dockerhub_username>
-export DOCKER_PASSWORD=<my_dockerhub_password>
-```
+    ```bash
+    export DOCKER_USERNAME=<my_dockerhub_username>
+    export DOCKER_PASSWORD=<my_dockerhub_password>
+    ```
 
-verify variables are set:
+2. Verify environment variables
+    </br>
 
-```bash
-printenv DOCKER_USERNAME
-printenv DOCKER_PASSWORD
-```
+    ```bash
+    printenv DOCKER_USERNAME
+    printenv DOCKER_PASSWORD
+    ```
 
-### Run the deploy script
+3. Run the deploy script
 
-Deploy all `Pipeline resources using the [deploy.sh](deploy.sh) script using the following command:
+    </br>
+    Deploy all `Pipeline resources using the [deploy.sh](deploy.sh) script using the following command:</br>
 
-```shell script
-./deploy.sh
-```
+    ```bash
+    ./deploy.sh
+    ```
 
-You should see all resource successfully created:
+    You should see all the pipeline resources were successfully created:
 
-```bash
-secret/dockerhub-user-pass created
-serviceaccount/openwhisk-app-builder created
-condition.tekton.dev/is-nodejs-runtime created
-condition.tekton.dev/is-java-runtime created
-condition.tekton.dev/is-python-runtime created
-persistentvolumeclaim/openwhisk-workspace created
-task.tekton.dev/clone-app-repo-to-workspace created
-task.tekton.dev/clone-runtime-repo-to-workspace created
-task.tekton.dev/task-install-npm-packages created
-task.tekton.dev/task-build-archive created
-task.tekton.dev/openwhisk created
-task.tekton.dev/task-install-pip-packages created
-task.tekton.dev/task-build-archive-python created
-task.tekton.dev/openwhisk-python created
-task.tekton.dev/create-jar-with-maven created
-task.tekton.dev/build-runtime-with-gradle created
-task.tekton.dev/build-shared-class-cache created
-task.tekton.dev/finalize-runtime-with-function created
-pipeline.tekton.dev/build-openwhisk-app created
-```
+    </br><details>
+        <summary>Example results:</summary>
 
-## Building OpenWhisk Applications using the pipeline
+    ```bash
+    secret/dockerhub-user-pass created
+    serviceaccount/openwhisk-app-builder created
+    condition.tekton.dev/is-nodejs-runtime created
+    condition.tekton.dev/is-java-runtime created
+    condition.tekton.dev/is-python-runtime created
+    persistentvolumeclaim/openwhisk-workspace created
+    task.tekton.dev/clone-app-repo-to-workspace created
+    task.tekton.dev/clone-runtime-repo-to-workspace created
+    task.tekton.dev/task-install-npm-packages created
+    task.tekton.dev/task-build-archive created
+    task.tekton.dev/openwhisk created
+    task.tekton.dev/task-install-pip-packages created
+    task.tekton.dev/task-build-archive-python created
+    task.tekton.dev/openwhisk-python created
+    task.tekton.dev/create-jar-with-maven created
+    task.tekton.dev/build-runtime-with-gradle created
+    task.tekton.dev/build-shared-class-cache created
+    task.tekton.dev/finalize-runtime-with-function created
+    pipeline.tekton.dev/build-openwhisk-app created
+    ```
+    </details>
+
+## Building OpenWhisk-compatible Applications for Knative using the pipeline
 
 In this section, we will describe how to use the pipeline to build and deploy Serverless application images for the following popular OpenWhisk languages using some sample functions:
 
