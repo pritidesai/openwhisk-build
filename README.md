@@ -212,7 +212,7 @@ These tasks are only executed if the `Condition` named `is-nodejs-runtime` retur
 
 #### Running the NodeJS example
 
-The `PipelineRun` resource used to build a Python application is derived from the template file named [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl).
+The `PipelineRun` resource used to build a Python application is named `build-javascript-app-image` and derived from the template file [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl).
 
 1. Execute `PipelineRun` with:
 
