@@ -49,25 +49,68 @@ Further verify that you have allocated enough resources to run all sample applic
 - [x] **Memory: 8.0 GiB**
 - [x] **Swap: 1.5 GiB**
 
-#### Verify your Kubernetes node is ready
+#### Verify Kubernetes
 
-```
-$ kubectl get nodes
+1. Verify node is ready
+    </br>
+    ```
+    $ kubectl get nodes
 
-NAME             STATUS    ROLES     AGE       VERSION
-docker-desktop   Ready     master    4d22h     v1.15.5
-```
+    NAME             STATUS    ROLES     AGE       VERSION
+    docker-desktop   Ready     master    4d22h     v1.15.5
+    ```
 
-#### Verify Kubernetes Installation
+2. Verify client and server versions
+</br>
+    ```bash
+    $ kubectl version
+    ```
 
-Use the following command to verify the Kubernetes **Server Version**:
+    ```bash
+    Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
+    Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:07:57Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"linux/amd64"}
+    ```
 
-```bash
-$ kubectl version
+3. Verify Kubernetes and Tekton pipeline pods are running
+<br>
+    ```bash
+    $ kubectl get pods --namespace kube-system
+    ```
+    <details>
+    <summary>Example results:</summary>
+    ```bash
+    $ kubectl get pods --namespace kube-system
+    ```
 
-Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
-Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:07:57Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"linux/amd64"}
-```
+    ```bash
+    NAME                                     READY   STATUS    RESTARTS   AGE
+    coredns-5c98db65d4-h5qhs                 1/1     Running   1          38d
+    coredns-5c98db65d4-hfxsq                 1/1     Running   1          38d
+    etcd-docker-desktop                      1/1     Running   0          38d
+    kube-apiserver-docker-desktop            1/1     Running   0          38d
+    kube-controller-manager-docker-desktop   1/1     Running   0          38d
+    kube-proxy-8sfxl                         1/1     Running   0          38d
+    kube-scheduler-docker-desktop            1/1     Running   1          38d
+    storage-provisioner                      1/1     Running   1          38d
+    ```
+
+    </details>
+    </br>
+
+    ```bash
+    $ kubectl get pods --namespace tekton-pipelines
+    ```
+
+    <details>
+    <summary>Example results:</summary>
+
+    ```bash
+    NAME                                           READY   STATUS    RESTARTS   AGE
+    tekton-pipelines-controller-7c67695997-4wtsf   1/1     Running   0          13d
+    tekton-pipelines-webhook-7787f6489-t28gj       1/1     Running   0          13d
+    ```
+
+    </details>
 
 ## Installing pipeline resources
 
