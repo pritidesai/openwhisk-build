@@ -23,6 +23,11 @@ auto-save-list
 tramp
 
 ##############################################
+# Artifacts from Knative/Istio installation
+##############################################
+istio-minimal-operator.yaml
+
+##############################################
 # Artifacts created by running samples
 ##############################################
 docker-secret.yaml

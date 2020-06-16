@@ -171,9 +171,10 @@ Follow these instructions to install the pipeline resources:
     task.tekton.dev/finalize-runtime-with-function created
     pipeline.tekton.dev/build-openwhisk-app created
     ```
+
     </details>
 
-## Building OpenWhisk-compatible Applications for Knative using the pipeline
+## Building OpenWhisk-compatible applications for Knative using the pipeline
 
 In this section, we will describe how to use the pipeline to build and deploy Serverless application images for the following popular OpenWhisk languages using some sample functions:
 
@@ -189,25 +190,19 @@ In addition, we will show how to confugre the pipeline to produce a Serverless a
 
 ### NodeJS
 
-#### Custom Tasks
+#### NodeJS custom Tasks
 
-The `Pipeline` includes the following customized `Tasks`  specific to NodeJS:
+The `Pipeline` includes the following customized `Tasks` specific to NodeJS that were installed with the [deploy.sh](deploy.sh) script:
 
-Here is the list of `Tasks` created:
+* [task-install-npm-packages](tasks/javascript/01-install-deps.yaml) - Pull NodeJS Application source with an OpenWhisk action from an open GitHub repo and download a list of dependencies specified in the `package.json` file.
 
-* [01-install-deps.yaml](tasks/javascript/01-install-deps.yaml) - Pull NodeJS Application source with an OpenWhisk action
-from an open GitHub repo and download a list of dependencies specified in the `package.json` file.
+* [task-build-archive](tasks/javascript/02-build-archive.yaml) - Build an archive with application source and all the dependencies.
 
-* [02-build-archive.yaml](tasks/javascript/02-build-archive.yaml) - Build an archive with application source and all the dependencies.
-
-* [03-openwhisk.yaml](tasks/javascript/03-openwhisk.yaml) - Inject NodeJS application archive built in previous task into the
-OpenWhisk runtime and build/publish an image.
-
-* Use Knative Serving to deploy the finalized image on Knative.
+* [openwhisk-node](tasks/javascript/03-openwhisk.yaml) - Inject NodeJS application archive built in previous task into the OpenWhisk runtime and build/publish an image.
 
 ![NodeJS pipeline resources](images/pipeline-customized-for-nodejs.png)
 
-#### Running the example
+#### Running the NodeJS example
 
 1. Execute `PipelineRun` with:
 
@@ -222,7 +217,7 @@ OpenWhisk runtime and build/publish an image.
     tkn pr describe build-javascript-app-image
     ```
 
-    ```
+    ```bash
     STATUS
     14 hours ago   52 seconds   Succeeded(Completed)
     ```
@@ -230,7 +225,7 @@ OpenWhisk runtime and build/publish an image.
     <details>
     <summary>Expand to see complete sample output </summary>
 
-    ```
+    ```bash
     Name:              build-javascript-app-image
     Namespace:         default
     Pipeline Ref:      build-openwhisk-app
@@ -272,14 +267,14 @@ OpenWhisk runtime and build/publish an image.
 
 3. Create a new service on Knative with:
 
-    ```shell script
+    ```bash
     sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-javascript-app.yaml.tmpl > services/service-openwhisk-javascript-app.yaml
     kubectl apply -f services/service-openwhisk-javascript-app.yaml
     ```
 
 4. Run the application service:
 
-    ```shell script
+    ```bash
     curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
     {"padded":[".........................Hello","..................How are you?"]}
     ```
@@ -288,88 +283,101 @@ OpenWhisk runtime and build/publish an image.
 
 ### Python
 
-#### Custom Tasks
+#### Python Custom Tasks
 
-The `Pipeline` includes the following customized `Tasks`  specific to Python:
+The `Pipeline` includes the following customized `Tasks` specific to Python that were installed with the [deploy.sh](deploy.sh) script:
 
-* [01-install-deps.yaml](tasks/javascript/01-install-deps.yaml) - Pull NodeJS Application source with an OpenWhisk action
-from an open GitHub repo and download a list of dependencies specified in the `package.json` file.
+* [task-install-pip-packages](tasks/python/01-install-deps.yaml) - Pull Python Application source with an OpenWhisk action from an open GitHub repo and download a list of dependencies specified in the `requirements.txt` file.
 
-* [02-build-archive.yaml](tasks/javascript/02-build-archive.yaml) - Build an archive with application source and all the dependencies.
+* [task-build-archive-python](tasks/python/02-build-archive.yaml) - Build an archive with application source and all the dependencies.
 
-* [03-openwhisk.yaml](tasks/javascript/03-openwhisk.yaml) - Inject NodeJS application archive built in previous task into the
-OpenWhisk runtime and build/publish an image.
-
-* Use Knative Serving to deploy the finalized image on Knative.
+* [openwhisk-python](tasks/python/03-openwhisk.yaml) - Inject Python application archive built in previous task into the OpenWhisk runtime and build/publish an image.
 
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.
 
 ![Python pipeline resources](images/pipeline-customized-for-python.png)
 
-Execute `PipelineRun` with:
+#### Running the Python example
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/python/pipelinerun-python.yaml.tmpl > pipelinerun/python/pipelinerun-python.yaml
-kubectl apply -f pipelinerun/python/pipelinerun-python.yaml
-```
+1. Execute `PipelineRun` with:
 
-Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
+    ```bash
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/python/pipelinerun-python.yaml.tmpl > pipelinerun/python/pipelinerun-python.yaml
+    kubectl apply -f pipelinerun/python/pipelinerun-python.yaml
+    ```
 
-```shell script
-tkn pr describe build-python-app-image
-Name:              build-python-app-image
-Namespace:         default
-Pipeline Ref:      build-openwhisk-app
-Service Account:   openwhisk-app-builder
-Timeout:           1h0m0s
-Labels:
- tekton.dev/pipeline=build-openwhisk-app
+2. Confirm that the `PipelineRun` completed successfully:
 
-🌡️  Status
+    ```bash
+    tkn pr describe build-javascript-app-image
+    ```
 
-STARTED      DURATION    STATUS
-1 hour ago   8 minutes   Succeeded(Completed)
+    ```bash
+    STATUS
+    14 hours ago   52 seconds   Succeeded(Completed)
+    ```
 
-📦 Resources
+    <details>
+    <summary>Expand to see complete sample output </summary>
 
- NAME            RESOURCE REF
- ∙ app-git
- ∙ runtime-git
- ∙ app-image
+    ```bash
+    tkn pr describe build-python-app-image
+    Name:              build-python-app-image
+    Namespace:         default
+    Pipeline Ref:      build-openwhisk-app
+    Service Account:   openwhisk-app-builder
+    Timeout:           1h0m0s
+    Labels:
+    tekton.dev/pipeline=build-openwhisk-app
 
-⚓ Params
+    🌡️  Status
 
- NAME               VALUE
- ∙ OW_APP_PATH      packages/helloMorse/
- ∙ DOCKERFILE       core/python3Action/Dockerfile
- ∙ OW_ACTION_NAME   openwhisk-morse-hello-app
+    STARTED      DURATION    STATUS
+    1 hour ago   8 minutes   Succeeded(Completed)
 
-🗂  Taskruns
+    📦 Resources
 
- NAME                                                       TASK NAME                          STARTED      DURATION     STATUS
- ∙ build-app-image-clone-java-app-source-f62w4              clone-java-app-source              ---          ---          Failed(ConditionCheckFailed)
- ∙ build-app-image-clone-nodejs-app-source-fsfqt            clone-nodejs-app-source            ---          ---          Failed(ConditionCheckFailed)
- ∙ build-app-image-build-openwhisk-app-image-python-h4kgv   build-openwhisk-app-image-python   1 hour ago   7 minutes    Succeeded
- ∙ build-app-image-build-archive-python-jwphl               build-archive-python               1 hour ago   11 seconds   Succeeded
- ∙ build-app-image-clone-python-runtime-source-cjgjz        clone-python-runtime-source        1 hour ago   11 seconds   Succeeded
- ∙ build-app-image-install-pip-packages-jvclf               install-pip-packages               1 hour ago   35 seconds   Succeeded
- ∙ build-app-image-clone-python-app-source-x44p2            clone-python-app-source            1 hour ago   6 seconds    Succeeded
-```
+    NAME            RESOURCE REF
+    ∙ app-git
+    ∙ runtime-git
+    ∙ app-image
 
-Create a new service on Knative with:
+    ⚓ Params
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-python-app.yaml.tmpl > services/service-openwhisk-python-app.yaml
-kubectl apply -f services/service-openwhisk-python-app.yaml
-```
+    NAME               VALUE
+    ∙ OW_APP_PATH      packages/helloMorse/
+    ∙ DOCKERFILE       core/python3Action/Dockerfile
+    ∙ OW_ACTION_NAME   openwhisk-morse-hello-app
 
-Run OpenWhisk NodeJS Application service:
+    🗂  Taskruns
 
-```shell script
-curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
-{"morseGreeting": ".... . .-.. .-.. --- --..--   .-- --- .-. .-.. -.. -.-.-- "}
-```
+    NAME                                                       TASK NAME                          STARTED      DURATION     STATUS
+    ∙ build-app-image-clone-java-app-source-f62w4              clone-java-app-source              ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-app-image-clone-nodejs-app-source-fsfqt            clone-nodejs-app-source            ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-app-image-build-openwhisk-app-image-python-h4kgv   build-openwhisk-app-image-python   1 hour ago   7 minutes    Succeeded
+    ∙ build-app-image-build-archive-python-jwphl               build-archive-python               1 hour ago   11 seconds   Succeeded
+    ∙ build-app-image-clone-python-runtime-source-cjgjz        clone-python-runtime-source        1 hour ago   11 seconds   Succeeded
+    ∙ build-app-image-install-pip-packages-jvclf               install-pip-packages               1 hour ago   35 seconds   Succeeded
+    ∙ build-app-image-clone-python-app-source-x44p2            clone-python-app-source            1 hour ago   6 seconds    Succeeded
+    ```
+
+    </details>
+    </br>
+
+3. Create a new service on Knative with:
+
+    ```bash
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-python-app.yaml.tmpl > services/service-openwhisk-python-app.yaml
+    kubectl apply -f services/service-openwhisk-python-app.yaml
+    ```
+
+4. Run the application service:
+
+    ```bash
+    curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
+    {"morseGreeting": ".... . .-.. .-.. --- --..--   .-- --- .-. .-.. -.. -.-.-- "}
+    ```
 
 ---
 
@@ -377,9 +385,9 @@ curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-
 
 In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an image with OpenWhisk Java Runtime serving an application source from GitHub repo.
 
-#### Custom Tasks
+#### Custom Java Tasks
 
-The `Pipeline` includes the following customized `Tasks`  specific to Java:
+The `Pipeline` includes the following customized `Tasks` specific to Java that were installed with the [deploy.sh](deploy.sh) script:
 
 * [01-create-jar-with-maven.yaml](tasks/java/01-create-jar-with-maven.yaml) - Pull Java Application with an OpenWhisk action
 from an open GitHub repo, with java action taking an image and converting it into gray image. Compile the source code
@@ -394,92 +402,116 @@ create Java Shared Class Cache for proxy.
 * [04-finalize-runtime-with-function.yaml](tasks/java/04-finalize-runtime-with-function.yaml) - Inject Java application
 Jar into the OpenWhisk runtime and build/publish an image.
 
-* Use Knative Serving to deploy the finalized image on Knative.
-
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
 pipeline run in [pipelinerun-java-yaml.tmpl](pipelinerun/java/pipelinerun-java.yaml.tmpl) to execute the pipeline.
 
-
 ![Java pipeline resources](images/pipeline-customized-for-java.png)
 
-Execute `PipelineRun` with:
+#### Running the Java example
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
-kubectl apply -f pipelinerun/java/pipelinerun-java.yaml
-```
+1. Execute `PipelineRun` with:
 
-Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
+    ```shell script
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/java/pipelinerun-java.yaml.tmpl > pipelinerun/java/pipelinerun-java.yaml
+    kubectl apply -f pipelinerun/java/pipelinerun-java.yaml
+    ```
 
-```shell script
-tkn pr describe build-java-app-image
-Name:              build-java-app-image
-Namespace:         default
-Pipeline Ref:      build-openwhisk-app
-Service Account:   openwhisk-app-builder
-Timeout:           1h0m0s
-Labels:
- tekton.dev/pipeline=build-openwhisk-app
+2. Confirm that the `PipelineRun` completed successfully:
 
-🌡️  Status
+    ```bash
+    tkn pr describe build-javascript-app-image
+    ```
 
-STARTED      DURATION    STATUS
-1 hour ago   2 minutes   Succeeded(Completed)
+    ```bash
+    STATUS
+    14 hours ago   52 seconds   Succeeded(Completed)
+    ```
 
-📦 Resources
+    <details>
+    <summary>Expand to see complete sample output </summary>
 
- NAME            RESOURCE REF
- ∙ app-git
- ∙ runtime-git
- ∙ app-image
+    ```bash
+    tkn pr describe build-java-app-image
+    Name:              build-java-app-image
+    Namespace:         default
+    Pipeline Ref:      build-openwhisk-app
+    Service Account:   openwhisk-app-builder
+    Timeout:           1h0m0s
+    Labels:
+    tekton.dev/pipeline=build-openwhisk-app
 
-⚓ Params
+    🌡️  Status
 
- NAME                     VALUE
- ∙ OW_BUILD_CONFIG_PATH   knative-build/runtimes/java/core/java8/proxy/
- ∙ OW_ACTION_NAME         openwhisk-java-app
- ∙ OW_RUNTIME_CONTEXT     dir:///workspace/openwhisk-workspace/runtime/knative-build/runtimes/java/core/java8/
- ∙ OW_AUTO_INIT_MAIN      Hello
+    STARTED      DURATION    STATUS
+    1 hour ago   2 minutes   Succeeded(Completed)
 
-🗂  Taskruns
+    📦 Resources
 
- NAME                                                          TASK NAME                        STARTED      DURATION     STATUS
- ∙ build-java-app-image-clone-nodejs-app-source-fpkrx          clone-nodejs-app-source          ---          ---          Failed(ConditionCheckFailed)
- ∙ build-java-app-image-clone-python-app-source-c67jq          clone-python-app-source          ---          ---          Failed(ConditionCheckFailed)
- ∙ build-java-app-image-finalize-runtime-with-function-nz96w   finalize-runtime-with-function   1 hour ago   1 minute     Succeeded
- ∙ build-java-app-image-build-shared-class-cache-wkrbc         build-shared-class-cache         1 hour ago   20 seconds   Succeeded
- ∙ build-java-app-image-build-runtime-with-gradle-2n989        build-runtime-with-gradle        1 hour ago   25 seconds   Succeeded
- ∙ build-java-app-image-clone-java-runtime-source-vzgs4        clone-java-runtime-source        1 hour ago   36 seconds   Succeeded
- ∙ build-java-app-image-create-jar-with-maven-jbp4t            create-jar-with-maven            1 hour ago   1 minute     Succeeded
- ∙ build-java-app-image-clone-java-app-source-wbqbl            clone-java-app-source            1 hour ago   8 seconds    Succeeded
-```
+    NAME            RESOURCE REF
+    ∙ app-git
+    ∙ runtime-git
+    ∙ app-image
 
-Create a new service on Knative with:
+    ⚓ Params
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-java-app.yaml.tmpl > services/service-openwhisk-java-app.yaml
-kubectl apply -f services/service-openwhisk-java-app.yaml
-```
+    NAME                     VALUE
+    ∙ OW_BUILD_CONFIG_PATH   knative-build/runtimes/java/core/java8/proxy/
+    ∙ OW_ACTION_NAME         openwhisk-java-app
+    ∙ OW_RUNTIME_CONTEXT     dir:///workspace/openwhisk-workspace/runtime/knative-build/runtimes/java/core/java8/
+    ∙ OW_AUTO_INIT_MAIN      Hello
 
-Run OpenWhisk Java Application service with few different images:
+    🗂  Taskruns
 
-```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 01-dice-gray.png
-```
+    NAME                                                          TASK NAME                        STARTED      DURATION     STATUS
+    ∙ build-java-app-image-clone-nodejs-app-source-fpkrx          clone-nodejs-app-source          ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-java-app-image-clone-python-app-source-c67jq          clone-python-app-source          ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-java-app-image-finalize-runtime-with-function-nz96w   finalize-runtime-with-function   1 hour ago   1 minute     Succeeded
+    ∙ build-java-app-image-build-shared-class-cache-wkrbc         build-shared-class-cache         1 hour ago   20 seconds   Succeeded
+    ∙ build-java-app-image-build-runtime-with-gradle-2n989        build-runtime-with-gradle        1 hour ago   25 seconds   Succeeded
+    ∙ build-java-app-image-clone-java-runtime-source-vzgs4        clone-java-runtime-source        1 hour ago   36 seconds   Succeeded
+    ∙ build-java-app-image-create-jar-with-maven-jbp4t            create-jar-with-maven            1 hour ago   1 minute     Succeeded
+    ∙ build-java-app-image-clone-java-app-source-wbqbl            clone-java-app-source            1 hour ago   8 seconds    Succeeded
+    ```
 
-![01-dice-color.png](images/01-dice-color.png)  ![01-dice-gray.png](images/01-dice-gray.png)
+    </details>
+    </br>
 
-```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
-```
+3. Create a new service on Knative with:
 
-![02-conf-crowd.png](images/02-conf-crowd.png) => ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
+    ```shell script
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-java-app.yaml.tmpl > services/service-openwhisk-java-app.yaml
+    kubectl apply -f services/service-openwhisk-java-app.yaml
+    ```
 
-```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$(base64 images/03-eclipsecon-2019.png | tr -d \\n)'"}}' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 03-eclipsecon-2019-gray.png
-```
+4. Run the application service with some different images:
 
-![03-eclipsecon-2019.png](images/03-eclipsecon-2019.png) => ![03-eclipsecon-2019-gray.png](images/03-eclipsecon-2019-gray.png)
+    </br>The Java application converts color images to grayscale. We have provide a few images within the repo. for you to try as examples:
+
+    </br>**Dice**</br>
+
+    ```bash
+    curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 01-dice-gray.png
+    ```
+
+    ![01-dice-color.png](images/01-dice-color.png)  ![01-dice-gray.png](images/01-dice-gray.png)
+
+    </br>**Crowd**</br>
+
+    ```bash
+    curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
+    ```
+
+    ![02-conf-crowd.png](images/02-conf-crowd.png) => ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
+
+<!-->
+    </br>**EclipseCon**</br>
+
+    ```shell script
+    curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$(base64 images/03-eclipsecon-2019.png | tr -d \\n)'"}}' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 03-eclipsecon-2019-gray.png
+    ```
+
+    ![03-eclipsecon-2019.png](images/03-eclipsecon-2019.png) => ![03-eclipsecon-2019-gray.png](images/03-eclipsecon-2019-gray.png)
+-->
 
 #### Java pipeline vision
 
