@@ -102,7 +102,8 @@ Deploy all `Pipeline resources using the [deploy.sh](deploy.sh) script using the
 ```
 
 You should see all resource successfully created:
-```shell script
+
+```bash
 secret/dockerhub-user-pass created
 serviceaccount/openwhisk-app-builder created
 condition.tekton.dev/is-nodejs-runtime created
@@ -136,8 +137,7 @@ In addition, we will show how to confugre the pipeline to produce a Serverless a
 
 - [Knative](https://knative.dev/) (default)
 - [Apache OpenWhisk](https://openwhisk.apache.org/)
-- [Project Coligo](https://cloud.ibm.com/docs/knative?topic=knative-kn-faqs)
-    - *An IBM experimental Knative-based container platform*
+- [Project Coligo](https://cloud.ibm.com/docs/knative?topic=knative-kn-faqs) *an IBM experimental Knative-based container platform*
 
 ### NodeJS
 
@@ -159,70 +159,83 @@ OpenWhisk runtime and build/publish an image.
 
 ![NodeJS pipeline resources](images/pipeline-customized-for-nodejs.png)
 
-Execute `PipelineRun` with:
+#### Running the example
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl > pipelinerun/javascript/pipelinerun-javascript.yaml
-kubectl apply -f pipelinerun/javascript/pipelinerun-javascript.yaml
-```
+1. Execute `PipelineRun` with:
 
-Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
+    ```bash
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl > pipelinerun/javascript/pipelinerun-javascript.yaml
+    kubectl apply -f pipelinerun/javascript/pipelinerun-javascript.yaml
+    ```
 
-```shell script
- tkn pr describe build-javascript-app-image
-Name:              build-javascript-app-image
-Namespace:         default
-Pipeline Ref:      build-openwhisk-app
-Service Account:   openwhisk-app-builder
-Timeout:           1h0m0s
-Labels:
- tekton.dev/pipeline=build-openwhisk-app
+2. Confirm that the `PipelineRun` completed successfully:
 
-🌡️  Status
+    ```bash
+    tkn pr describe build-javascript-app-image
+    ```
 
-STARTED        DURATION     STATUS
-14 hours ago   52 seconds   Succeeded(Completed)
+    ```
+    STATUS
+    14 hours ago   52 seconds   Succeeded(Completed)
+    ```
 
+    <details>
+    <summary>Expand to see complete sample output </summary>
 
-📦 Resources
+    ```
+    Name:              build-javascript-app-image
+    Namespace:         default
+    Pipeline Ref:      build-openwhisk-app
+    Service Account:   openwhisk-app-builder
+    Timeout:           1h0m0s
+    Labels:
+    tekton.dev/pipeline=build-openwhisk-app
 
- NAME            RESOURCE REF
- ∙ app-git
- ∙ runtime-git
- ∙ app-image
+    🌡️  Status
 
-⚓ Params
+    STARTED        DURATION     STATUS
+    14 hours ago   52 seconds   Succeeded(Completed)
 
- NAME               VALUE
- ∙ OW_APP_PATH      packages/left-pad/
- ∙ DOCKERFILE       core/nodejs10Action/knative/Dockerfile
- ∙ OW_ACTION_NAME   openwhisk-padding-app
+    📦 Resources
+    NAME            RESOURCE REF
+    ∙ app-git
+    ∙ runtime-git
+    ∙ app-image
 
-🗂  Taskruns
+    ⚓ Params
+    NAME               VALUE
+    ∙ OW_APP_PATH      packages/left-pad/
+    ∙ DOCKERFILE       core/nodejs10Action/knative/Dockerfile
+    ∙ OW_ACTION_NAME   openwhisk-padding-app
 
- NAME                                                                TASK NAME                        STARTED        DURATION     STATUS
- ∙ build-javascript-app-image-clone-python-app-source-g9vnd          clone-python-app-source          ---            ---          Failed(ConditionCheckFailed)
- ∙ build-javascript-app-image-clone-java-app-source-2t4mf            clone-java-app-source            ---            ---          Failed(ConditionCheckFailed)
- ∙ build-javascript-app-image-build-openwhisk-app-image-node-mm8zj   build-openwhisk-app-image-node   14 hours ago   3 minutes    Succeeded
- ∙ build-javascript-app-image-build-archive-node-nv48j               build-archive-node               14 hours ago   11 seconds   Succeeded
- ∙ build-javascript-app-image-clone-nodejs-runtime-source-7ksnl      clone-nodejs-runtime-source      14 hours ago   12 seconds   Succeeded
- ∙ build-javascript-app-image-install-npm-packages-4dxrg             install-npm-packages             14 hours ago   11 seconds   Succeeded
- ∙ build-javascript-app-image-clone-nodejs-app-source-64hdr          clone-nodejs-app-source          14 hours ago   7 seconds    Succeeded
-```
+    🗂  Taskruns
+    NAME                                                                TASK NAME                        STARTED        DURATION     STATUS
+    ∙ build-javascript-app-image-clone-python-app-source-g9vnd          clone-python-app-source          ---            ---          Failed(ConditionCheckFailed)
+    ∙ build-javascript-app-image-clone-java-app-source-2t4mf            clone-java-app-source            ---            ---          Failed(ConditionCheckFailed)
+    ∙ build-javascript-app-image-build-openwhisk-app-image-node-mm8zj   build-openwhisk-app-image-node   14 hours ago   3 minutes    Succeeded
+    ∙ build-javascript-app-image-build-archive-node-nv48j               build-archive-node               14 hours ago   11 seconds   Succeeded
+    ∙ build-javascript-app-image-clone-nodejs-runtime-source-7ksnl      clone-nodejs-runtime-source      14 hours ago   12 seconds   Succeeded
+    ∙ build-javascript-app-image-install-npm-packages-4dxrg             install-npm-packages             14 hours ago   11 seconds   Succeeded
+    ∙ build-javascript-app-image-clone-nodejs-app-source-64hdr          clone-nodejs-app-source          14 hours ago   7 seconds    Succeeded
+    ```
 
-Create a new service on Knative with:
+    </details>
+    </br>
 
-```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-javascript-app.yaml.tmpl > services/service-openwhisk-javascript-app.yaml
-kubectl apply -f services/service-openwhisk-javascript-app.yaml
-```
+3. Create a new service on Knative with:
 
-Run OpenWhisk NodeJS Application service:
+    ```shell script
+    sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' services/service-openwhisk-javascript-app.yaml.tmpl > services/service-openwhisk-javascript-app.yaml
+    kubectl apply -f services/service-openwhisk-javascript-app.yaml
+    ```
 
-```shell script
-curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
-{"padded":[".........................Hello","..................How are you?"]}
-```
+4. Run the application service:
+
+    ```shell script
+    curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
+    {"padded":[".........................Hello","..................How are you?"]}
+    ```
+
 ---
 
 ### Python
