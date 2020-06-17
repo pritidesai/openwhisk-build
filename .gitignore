@@ -37,3 +37,10 @@ docker-secret.yaml
 .gradle
 build/
 bin/
+
+##############################################
+# Artifacts from examples
+##############################################
+pipelinerun/javascript/pipelinerun-javascript.yaml
+pipelinerun/java/pipelinerun-java.yaml
+pipelinerun/python/pipelinerun-python.yaml

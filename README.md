@@ -372,7 +372,7 @@ The `PipelineRun` resource used to build a Python application is derived from th
 
     ```bash
     STATUS
-    14 hours ago   52 seconds   Succeeded(Completed)
+    1 hour ago   8 minutes   Succeeded(Completed)
     ```
 
     <details>
@@ -446,18 +446,13 @@ In a recent experiment with OpenWhisk, we built a Tekton pipeline to create an i
 
 The `Pipeline` includes the following customized `Tasks` specific to Java that were installed with the [deploy.sh](deploy.sh) script:
 
-* [01-create-jar-with-maven.yaml](tasks/java/01-create-jar-with-maven.yaml) - Pull Java Application with an OpenWhisk action
-from an open GitHub repo, with java action taking an image and converting it into gray image. Compile the source code
-and build Jar file using Maven if POM file exists at the root of application repo.
+* [create-jar-with-maven](tasks/java/01-create-jar-with-maven.yaml) - Pull Java Application with an OpenWhisk action from an open GitHub repo, with java action taking an image and converting it into gray image. Compile the source code and build Jar file using Maven if POM file exists at the root of application repo.
 
-* [02-build-runtime-with-gradle.yaml](tasks/java/02-build-runtime-with-gradle.yaml) - Select the JDK version, optional framework,
-and optional profile libraries.
+* [build-runtime-with-gradle](tasks/java/02-build-runtime-with-gradle.yaml) - Select the JDK version, optional framework, and optional profile libraries.
 
-* [03-build-shared-class-cache.yaml](tasks/java/03-build-shared-class-cache.yaml) - Compile OpenWhisk Java runtime i.e.
-create Java Shared Class Cache for proxy.
+* [build-shared-class-cache](tasks/java/03-build-shared-class-cache.yaml) - Compile OpenWhisk Java runtime i.e. create Java Shared Class Cache for proxy.
 
-* [04-finalize-runtime-with-function.yaml](tasks/java/04-finalize-runtime-with-function.yaml) - Inject Java application
-Jar into the OpenWhisk runtime and build/publish an image.
+* [finalize-runtime-with-function](tasks/java/04-finalize-runtime-with-function.yaml) - Inject Java application Jar into the OpenWhisk runtime and build/publish an image.
 
 These tasks are only executed if the `Condition` named `is-java-runtime` returns a `true` value.  Effectively, the Java tasks are considered a Java-specific branch within the general pipeline.
 
@@ -477,19 +472,18 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 2. Confirm that the `PipelineRun` completed successfully:
 
     ```bash
-    tkn pr describe build-javascript-app-image
+    tkn pr describe build-java-app-image
     ```
 
     ```bash
-    STATUS
-    14 hours ago   52 seconds   Succeeded(Completed)
+    STARTED      DURATION    STATUS
+    1 hour ago   2 minutes   Succeeded(Completed)
     ```
 
     <details>
     <summary>Expand to see complete sample output </summary>
 
     ```bash
-    tkn pr describe build-java-app-image
     Name:              build-java-app-image
     Namespace:         default
     Pipeline Ref:      build-openwhisk-app
@@ -521,14 +515,14 @@ The `PipelineRun` resource used to build a Java application is derived from the 
     🗂  Taskruns
 
     NAME                                                          TASK NAME                        STARTED      DURATION     STATUS
-    ∙ build-java-app-image-clone-nodejs-app-source-fpkrx          clone-nodejs-app-source          ---          ---          Failed(ConditionCheckFailed)
-    ∙ build-java-app-image-clone-python-app-source-c67jq          clone-python-app-source          ---          ---          Failed(ConditionCheckFailed)
-    ∙ build-java-app-image-finalize-runtime-with-function-nz96w   finalize-runtime-with-function   1 hour ago   1 minute     Succeeded
-    ∙ build-java-app-image-build-shared-class-cache-wkrbc         build-shared-class-cache         1 hour ago   20 seconds   Succeeded
-    ∙ build-java-app-image-build-runtime-with-gradle-2n989        build-runtime-with-gradle        1 hour ago   25 seconds   Succeeded
-    ∙ build-java-app-image-clone-java-runtime-source-vzgs4        clone-java-runtime-source        1 hour ago   36 seconds   Succeeded
-    ∙ build-java-app-image-create-jar-with-maven-jbp4t            create-jar-with-maven            1 hour ago   1 minute     Succeeded
-    ∙ build-java-app-image-clone-java-app-source-wbqbl            clone-java-app-source            1 hour ago   8 seconds    Succeeded
+    ∙ build-java-app-image-clone-nodejs-app-source-78jgm          clone-nodejs-app-source          ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-java-app-image-clone-python-app-source-2tw6h          clone-python-app-source          ---          ---          Failed(ConditionCheckFailed)
+    ∙ build-java-app-image-finalize-runtime-with-function-bcdl8   finalize-runtime-with-function   1 hour ago   1 minute     Succeeded
+    ∙ build-java-app-image-build-shared-class-cache-qxtw5         build-shared-class-cache         1 hour ago   23 seconds   Succeeded
+    ∙ build-java-app-image-build-runtime-with-gradle-q8795        build-runtime-with-gradle        1 hour ago   21 seconds   Succeeded
+    ∙ build-java-app-image-create-jar-with-maven-xp25v            create-jar-with-maven            1 hour ago   40 seconds   Succeeded
+    ∙ build-java-app-image-clone-java-runtime-source-7kg4d        clone-java-runtime-source        1 hour ago   45 seconds   Succeeded
+    ∙ build-java-app-image-clone-java-app-source-zx2s4            clone-java-app-source            1 hour ago   10 seconds   Succeeded
     ```
 
     </details>
@@ -543,7 +537,7 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
 4. Run the application service with some different images:
 
-    </br>The Java application converts color images to grayscale. We have provide a few images within the repo. for you to try as examples:
+    </br>The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also pbase64 encoded the input images within a JSON that can be passed directly to the Java function.
 
     </br>**Dice**</br>
 
