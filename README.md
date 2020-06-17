@@ -42,8 +42,9 @@ Specifically, for development and testing on Mac OS, the following components an
 
 In order to run the sample applications, you must also install Knative:
 
-- [x] [Knative Serving](https://knative.dev/docs/install/any-kubernetes-cluster/) 0.14.1 *(for running examples)*
-  - which requires a networking layer where we chose [Istio without sidecars](https://knative.dev/docs/install/installing-istio/#installing-istio-without-sidecar-injection) x.xx.x
+- [x] [Knative Serving](https://knative.dev/v0.14-docs/install/any-kubernetes-cluster/) 0.14.1 *(for running examples)*
+  - which requires a networking layer selection.
+  - we chose [Istio without sidecars](https://knative.dev/v0.14-docs/install/installing-istio/#installing-istio-without-sidecar-injection)
 
 #### Docker Desktop resources
 
@@ -77,7 +78,7 @@ Further verify that you have allocated enough resources to run all sample applic
     Server Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:07:57Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"linux/amd64"}
     ```
 
-3. Verify Kubernetes and Tekton pipeline pods are running
+3. Verify **Kubernetes** and **Tekton** pipeline pods are running
     <br>
 
     ```bash
@@ -115,6 +116,47 @@ Further verify that you have allocated enough resources to run all sample applic
     ```
 
     </details>
+    </br>
+
+4. Verify **Knative** and **Istio** pods are running if you intend to run the examples locally
+
+    </br>
+
+    ```bash
+    $ kubectl get pods --namespace knative-serving
+    ```
+
+    <details>
+    <summary>Example results:</summary>
+
+    ```bash
+    NAME                                READY   STATUS    RESTARTS   AGE
+    activator-f49d99b94-rhnbc           1/1     Running   0          21m
+    autoscaler-67565c885f-c962h         1/1     Running   0          21m
+    controller-c97f7664d-gdw6t          1/1     Running   0          21m
+    istio-webhook-b65488fbc-b89s6       1/1     Running   0          7m18s
+    networking-istio-7d9d688b86-rlkls   1/1     Running   0          7m18s
+    webhook-85d4689d6b-kfnhz            1/1     Running   0          21m
+    ```
+
+    </details>
+    </br>
+
+    ```bash
+    $ kubectl get pods --namespace istio-system
+    ```
+
+    <details>
+    <summary>Example results:</summary>
+
+    ```bash
+    NAME                                   READY   STATUS    RESTARTS   AGE
+    istio-ingressgateway-c6978c57b-bqzgw   1/1     Running   0          23m
+    istio-pilot-5bdb6c9ddf-frflj           1/1     Running   0          23m
+    ```
+
+    </details>
+    </br>
 
 ## Installing pipeline resources
 

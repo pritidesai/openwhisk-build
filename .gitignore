@@ -25,6 +25,7 @@ tramp
 ##############################################
 # Artifacts from Knative/Istio installation
 ##############################################
+/istio*
 istio-minimal-operator.yaml
 
 ##############################################
