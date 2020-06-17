@@ -2,9 +2,9 @@
 
 *This catalog offering provides a single pipeline that can be used to build either [Apache OpenWhisk](https://openwhisk.apache.org/) or [Knative](https://openwhisk.apache.org/) compatible containers for supported runtimes used to execute OpenWhisk serverless functions.*
 
-As background, the [Apache OpenWhisk project](https://openwhisk.apache.org/) provides a robust implementation of a  Function-as-a-Service (FaaS) platform to run serverless applications written in any functional language.
+As background, the [Apache OpenWhisk project](https://openwhisk.apache.org/) provides a robust implementation of a Function-as-a-Service (FaaS) platform to run serverless applications written in any functional language.
 
-The project provides a set of [supported language runtimes](https://openwhisk.apache.org/downloads.html#component-releases) that includes a proxy enforces a documented contract for function initialization (function injection) and execution along with a standard context. Several of these runtimes, such as NodeJS, Python and Java, have been updated to support execution on as containers on either OpenWhisk or [Knative](https://openwhisk.apache.org/) clusters. In the latter case, the resultant containers can be run as on Knative without requiring an OpenWhisk control plane.
+The project provides a set of [supported language runtimes](https://openwhisk.apache.org/downloads.html#component-releases) that includes a proxy that enforces a *documented contract for function initialization (function injection) and execution* along with a standard context. Several of these runtimes, such as NodeJS, Python and Java, have been updated to support execution on as containers on either OpenWhisk or [Knative](https://openwhisk.apache.org/) clusters. In the latter case, the resultant containers can be run as on Knative without requiring an OpenWhisk control plane.
 
 ## Pipeline resources
 
