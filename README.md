@@ -537,7 +537,7 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
 4. Run the application service with some different images:
 
-    </br>The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also pbase64 encoded the input images within a JSON that can be passed directly to the Java function.
+    </br>The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also base64 encoded the input images within JSON files that can be passed directly to the Java function as parameters.
 
     </br>**Dice**</br>
 
