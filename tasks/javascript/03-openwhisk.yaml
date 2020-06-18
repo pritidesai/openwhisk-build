@@ -81,19 +81,11 @@ spec:
           ENV __OW_ACTION_RAW "$(params.OW_ACTION_RAW)"
         EOF
         echo "Done updating Dockerfile"
-    - name: update-dockerfile-for-tekton
-      image: ubuntu
-      command:
-        - sed
-      args:
-        - -i
-        - -e
-        - 's/COPY ./COPY .\/runtime/g'
-        - $(params.DOCKERFILE)
     - name: build-openwhisk-app-image
       image: "gcr.io/kaniko-project/executor:latest"
       command:
         - /kaniko/executor
       args:
-        - --dockerfile=$(params.DOCKERFILE)
-        - --destination=$(resources.outputs.app-image.url)
+        - --dockerfile=$(workspaces.openwhisk-workspace.path)/runtime/$(params.DOCKERFILE)
+        - --destination=$(outputs.resources.app-image.url)
+        - --context=dir://$(workspaces.openwhisk-workspace.path)/runtime/
