@@ -168,7 +168,7 @@ Follow these instructions to install the pipeline resources:
 
 1. Set Docker environment variables
 
-    </br>The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
+    The deployment script needs two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to your Docker basic auth. credentials (i.e., DockerHub username and password) with the *values provided in plain text*.
     </br>
 
     ```bash
