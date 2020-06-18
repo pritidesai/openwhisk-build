@@ -530,25 +530,33 @@ The `PipelineRun` resource used to build a Java application is derived from the 
     kubectl apply -f services/service-openwhisk-java-app.yaml
     ```
 
-4. Run the application service with some different images:
+4. Invoke the Java sample application service with some different images
 
     The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also base64 encoded the input images within JSON files that can be passed directly to the Java function as parameters.
 
-    </br>**Dice**</br>
+    **Dice image example**
+
+    <br>Run the following curl command to convert the image:
 
     ```bash
     curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 01-dice-gray.png
     ```
 
-    ![01-dice-color.png](images/01-dice-color.png)  ![01-dice-gray.png](images/01-dice-gray.png)
+    The images before and after conversion:
+    ![01-dice-color.png](images/01-dice-color.png)
+    ![01-dice-gray.png](images/01-dice-gray.png)
 
-    </br>**Crowd**</br>
+    **Dice image example**
+
+    <br>Run the following curl command to convert the image:
 
     ```bash
     curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
     ```
 
-    ![02-conf-crowd.png](images/02-conf-crowd.png) => ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
+    The images before and after conversion:
+    ![02-conf-crowd.png](images/02-conf-crowd.png)
+    ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
 
 #### Java pipeline vision
 
