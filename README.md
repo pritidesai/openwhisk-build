@@ -38,9 +38,15 @@ serviceaccount/openwhisk-app-builder created
 condition.tekton.dev/is-nodejs-runtime created
 condition.tekton.dev/is-java-runtime created
 condition.tekton.dev/is-python-runtime created
+persistentvolumeclaim/openwhisk-workspace created
+task.tekton.dev/clone-app-repo-to-workspace created
+task.tekton.dev/clone-runtime-repo-to-workspace created
 task.tekton.dev/task-install-npm-packages created
 task.tekton.dev/task-build-archive created
 task.tekton.dev/openwhisk created
+task.tekton.dev/task-install-pip-packages created
+task.tekton.dev/task-build-archive-python created
+task.tekton.dev/openwhisk-python created
 task.tekton.dev/create-jar-with-maven created
 task.tekton.dev/build-runtime-with-gradle created
 task.tekton.dev/build-shared-class-cache created
@@ -58,45 +64,46 @@ kubectl apply -f pipelinerun/java/pipelinerun-java.yaml
 Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
 
 ```shell script
-kubectl get all
-NAME                                                                  READY   STATUS      RESTARTS   AGE
-pod/build-java-app-image-build-runtime-with-gradle-5s7pt-pod-x6btf    0/5     Completed   0          4m1s
-pod/build-java-app-image-build-shared-class-cache-7w9q6-pod-5dw4n     0/6     Completed   0          3m27s
-pod/build-java-app-image-create-jar-with-maven-9l6hh-is-java--mcrlw   0/2     Completed   0          5m37s
-pod/build-java-app-image-create-jar-with-maven-9l6hh-pod-t6c2x        0/9     Completed   0          5m22s
-pod/build-java-app-image-finalize-runtime-with-function-59qfw-fxhgt   0/10    Completed   0          2m53s
-pod/build-java-app-image-install-npm-packages-xzgvz-is-nodejs-tkmzn   0/2     Error       0          5m37s
+tkn pr describe build-java-app-image
+Name:              build-java-app-image
+Namespace:         default
+Pipeline Ref:      build-openwhisk-app
+Service Account:   openwhisk-app-builder
+Timeout:           1h0m0s
+Labels:
+ tekton.dev/pipeline=build-openwhisk-app
 
-NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   96d
+🌡️  Status
 
-NAME                                                                                 SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
-taskrun.tekton.dev/build-java-app-image-build-runtime-with-gradle-5s7pt              True        Succeeded   4m1s        3m27s
-taskrun.tekton.dev/build-java-app-image-build-shared-class-cache-7w9q6               True        Succeeded   3m27s       2m53s
-taskrun.tekton.dev/build-java-app-image-create-jar-with-maven-9l6hh                  True        Succeeded   5m22s       4m1s
-taskrun.tekton.dev/build-java-app-image-create-jar-with-maven-9l6hh-is-java--gxqfx   True        Succeeded   5m37s       5m22s
-taskrun.tekton.dev/build-java-app-image-finalize-runtime-with-function-59qfw         True        Succeeded   2m53s       92s
-taskrun.tekton.dev/build-java-app-image-install-npm-packages-xzgvz-is-nodejs-6g7hb   False       Failed      5m37s       5m22s
+STARTED      DURATION    STATUS
+1 hour ago   2 minutes   Succeeded(Completed)
 
-NAME                                     AGE
-condition.tekton.dev/is-java-runtime     16m
-condition.tekton.dev/is-nodejs-runtime   16m
-condition.tekton.dev/is-python-runtime   16m
+📦 Resources
 
-NAME                                          SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
-pipelinerun.tekton.dev/build-java-app-image   True        Succeeded   5m37s       92s
+ NAME            RESOURCE REF
+ ∙ app-git
+ ∙ runtime-git
+ ∙ app-image
 
-NAME                                             AGE
-task.tekton.dev/build-runtime-with-gradle        16m
-task.tekton.dev/build-shared-class-cache         16m
-task.tekton.dev/create-jar-with-maven            16m
-task.tekton.dev/finalize-runtime-with-function   16m
-task.tekton.dev/openwhisk                        16m
-task.tekton.dev/task-build-archive               16m
-task.tekton.dev/task-install-npm-packages        16m
+⚓ Params
 
-NAME                                      AGE
-pipeline.tekton.dev/build-openwhisk-app   16m
+ NAME                     VALUE
+ ∙ OW_BUILD_CONFIG_PATH   knative-build/runtimes/java/core/java8/proxy/
+ ∙ OW_ACTION_NAME         openwhisk-java-app
+ ∙ OW_RUNTIME_CONTEXT     dir:///workspace/openwhisk-workspace/runtime/knative-build/runtimes/java/core/java8/
+ ∙ OW_AUTO_INIT_MAIN      Hello
+
+🗂  Taskruns
+
+ NAME                                                          TASK NAME                        STARTED      DURATION     STATUS
+ ∙ build-java-app-image-clone-nodejs-app-source-fpkrx          clone-nodejs-app-source          ---          ---          Failed(ConditionCheckFailed)
+ ∙ build-java-app-image-clone-python-app-source-c67jq          clone-python-app-source          ---          ---          Failed(ConditionCheckFailed)
+ ∙ build-java-app-image-finalize-runtime-with-function-nz96w   finalize-runtime-with-function   1 hour ago   1 minute     Succeeded
+ ∙ build-java-app-image-build-shared-class-cache-wkrbc         build-shared-class-cache         1 hour ago   20 seconds   Succeeded
+ ∙ build-java-app-image-build-runtime-with-gradle-2n989        build-runtime-with-gradle        1 hour ago   25 seconds   Succeeded
+ ∙ build-java-app-image-clone-java-runtime-source-vzgs4        clone-java-runtime-source        1 hour ago   36 seconds   Succeeded
+ ∙ build-java-app-image-create-jar-with-maven-jbp4t            create-jar-with-maven            1 hour ago   1 minute     Succeeded
+ ∙ build-java-app-image-clone-java-app-source-wbqbl            clone-java-app-source            1 hour ago   8 seconds    Succeeded
 ```
 
 Create a new service on Knative with:
@@ -109,19 +116,19 @@ kubectl apply -f service/service-openwhisk-java-app.yaml
 Run OpenWhisk Java Application service with few different images:
 
 ```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost:32319/run | jq -r '.body' | base64 -D > 01-dice-gray.png
+curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 01-dice-gray.png
 ```
 
 ![01-dice-color.png](images/01-dice-color.png) => ![01-dice-gray.png](images/01-dice-gray.png)
 
 ```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost:32319/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
+curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
 ```
 
 ![02-conf-crowd.png](images/02-conf-crowd.png) => ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
 
 ```shell script
-curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$(base64 images/03-eclipsecon-2019.png | tr -d \\n)'"}}' -H "Content-Type: application/json" -X POST http://localhost:32319/run | jq -r '.body' | base64 -D > 03-eclipsecon-2019-gray.png
+curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$(base64 images/03-eclipsecon-2019.png | tr -d \\n)'"}}' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 03-eclipsecon-2019-gray.png
 ```
 
 ![03-eclipsecon-2019.png](images/03-eclipsecon-2019.png) => ![03-eclipsecon-2019-gray.png](images/03-eclipsecon-2019-gray.png)
@@ -142,7 +149,7 @@ OpenWhisk runtime and build/publish an image.
 * Use Knative Serving to deploy the finalized image on Knative.
 
 This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
-pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.  
+pipeline run in [pipelinerun-javascript.yaml.tmpl](pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl) to execute the pipeline.
 
 Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh) if not already done:
 
@@ -155,9 +162,15 @@ serviceaccount/openwhisk-app-builder created
 condition.tekton.dev/is-nodejs-runtime created
 condition.tekton.dev/is-java-runtime created
 condition.tekton.dev/is-python-runtime created
+persistentvolumeclaim/openwhisk-workspace created
+task.tekton.dev/clone-app-repo-to-workspace created
+task.tekton.dev/clone-runtime-repo-to-workspace created
 task.tekton.dev/task-install-npm-packages created
 task.tekton.dev/task-build-archive created
 task.tekton.dev/openwhisk created
+task.tekton.dev/task-install-pip-packages created
+task.tekton.dev/task-build-archive-python created
+task.tekton.dev/openwhisk-python created
 task.tekton.dev/create-jar-with-maven created
 task.tekton.dev/build-runtime-with-gradle created
 task.tekton.dev/build-shared-class-cache created
@@ -168,50 +181,52 @@ pipeline.tekton.dev/build-openwhisk-app created
 Execute `PipelineRun` with:
 
 ```shell script
-sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl > pipelinerun/javascript/pipelinerun-build-padding-app.yaml
-kubectl apply -f pipelinerun/javascript/pipelinerun-build-padding-app.yaml
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/javascript/pipelinerun-javascript.yaml.tmpl > pipelinerun/javascript/pipelinerun-javascript.yaml
+kubectl apply -f pipelinerun/javascript/pipelinerun-javascript.yaml
 ```
 
 Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
 
 ```shell script
-kubectl get all
-NAME                                                                  READY   STATUS      RESTARTS   AGE
-pod/build-app-image-build-archive-76bqc-pod-nd9h6                     0/6     Completed   0          6m13s
-pod/build-app-image-build-openwhisk-app-image-n8g66-pod-zqdwm         0/8     Completed   0          5m47s
-pod/build-app-image-create-jar-with-maven-z2tfj-is-java-runti-bzrbk   0/2     Error       0          6m39s
-pod/build-app-image-install-npm-packages-f2vq7-is-nodejs-runt-4h9ck   0/2     Completed   0          6m39s
-pod/build-app-image-install-npm-packages-f2vq7-pod-8xzpr              0/5     Completed   0          6m30s
+ tkn pr describe build-javascript-app-image
+Name:              build-javascript-app-image
+Namespace:         default
+Pipeline Ref:      build-openwhisk-app
+Service Account:   openwhisk-app-builder
+Timeout:           1h0m0s
+Labels:
+ tekton.dev/pipeline=build-openwhisk-app
 
-NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   96d
+🌡️  Status
 
-NAME                                             AGE
-task.tekton.dev/build-runtime-with-gradle        29m
-task.tekton.dev/build-shared-class-cache         29m
-task.tekton.dev/create-jar-with-maven            29m
-task.tekton.dev/finalize-runtime-with-function   29m
-task.tekton.dev/openwhisk                        29m
-task.tekton.dev/task-build-archive               29m
-task.tekton.dev/task-install-npm-packages        29m
+STARTED        DURATION     STATUS
+14 hours ago   52 seconds   Succeeded(Completed)
 
-NAME                                      AGE
-pipeline.tekton.dev/build-openwhisk-app   29m
 
-NAME                                                                                 SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
-taskrun.tekton.dev/build-app-image-build-archive-76bqc                               True        Succeeded   6m13s       5m47s
-taskrun.tekton.dev/build-app-image-build-openwhisk-app-image-n8g66                   True        Succeeded   5m47s       2m31s
-taskrun.tekton.dev/build-app-image-create-jar-with-maven-z2tfj-is-java-runti-b5jlh   False       Failed      6m39s       6m27s
-taskrun.tekton.dev/build-app-image-install-npm-packages-f2vq7                        True        Succeeded   6m31s       6m13s
-taskrun.tekton.dev/build-app-image-install-npm-packages-f2vq7-is-nodejs-runt-z8wc9   True        Succeeded   6m39s       6m31s
+📦 Resources
 
-NAME                                     AGE
-condition.tekton.dev/is-java-runtime     30m
-condition.tekton.dev/is-nodejs-runtime   30m
-condition.tekton.dev/is-python-runtime   30m
+ NAME            RESOURCE REF
+ ∙ app-git
+ ∙ runtime-git
+ ∙ app-image
 
-NAME                                     SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
-pipelinerun.tekton.dev/build-app-image   True        Succeeded   6m39s       2m31s
+⚓ Params
+
+ NAME               VALUE
+ ∙ OW_APP_PATH      packages/left-pad/
+ ∙ DOCKERFILE       core/nodejs10Action/knative/Dockerfile
+ ∙ OW_ACTION_NAME   openwhisk-padding-app
+
+🗂  Taskruns
+
+ NAME                                                                TASK NAME                        STARTED        DURATION     STATUS
+ ∙ build-javascript-app-image-clone-python-app-source-g9vnd          clone-python-app-source          ---            ---          Failed(ConditionCheckFailed)
+ ∙ build-javascript-app-image-clone-java-app-source-2t4mf            clone-java-app-source            ---            ---          Failed(ConditionCheckFailed)
+ ∙ build-javascript-app-image-build-openwhisk-app-image-node-mm8zj   build-openwhisk-app-image-node   14 hours ago   3 minutes    Succeeded
+ ∙ build-javascript-app-image-build-archive-node-nv48j               build-archive-node               14 hours ago   11 seconds   Succeeded
+ ∙ build-javascript-app-image-clone-nodejs-runtime-source-7ksnl      clone-nodejs-runtime-source      14 hours ago   12 seconds   Succeeded
+ ∙ build-javascript-app-image-install-npm-packages-4dxrg             install-npm-packages             14 hours ago   11 seconds   Succeeded
+ ∙ build-javascript-app-image-clone-nodejs-app-source-64hdr          clone-nodejs-app-source          14 hours ago   7 seconds    Succeeded
 ```
 
 Create a new service on Knative with:
@@ -224,6 +239,114 @@ kubectl apply -f service/service-openwhisk-javascript-app.yaml
 Run OpenWhisk NodeJS Application service:
 
 ```shell script
-curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost:32319/
+curl -H "Host: openwhisk-javascript-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
 {"padded":[".........................Hello","..................How are you?"]}
+```
+
+## Python
+
+Here is the list of `Tasks` created:
+
+* [01-install-deps.yaml](tasks/javascript/01-install-deps.yaml) - Pull NodeJS Application source with an OpenWhisk action
+from an open GitHub repo and download a list of dependencies specified in the `package.json` file.
+
+* [02-build-archive.yaml](tasks/javascript/02-build-archive.yaml) - Build an archive with application source and all the dependencies.
+
+* [03-openwhisk.yaml](tasks/javascript/03-openwhisk.yaml) - Inject NodeJS application archive built in previous task into the
+OpenWhisk runtime and build/publish an image.
+
+* Use Knative Serving to deploy the finalized image on Knative.
+
+This entire pipeline is designed in [pipeline-to-build-openwhisk-app.yaml](pipeline/pipeline-to-build-openwhisk-app.yaml) including all the `Tasks` defined above and
+pipeline run in [pipelinerun-build-padding-app.yaml.tmpl](pipelinerun/javascript/pipelinerun-build-padding-app.yaml.tmpl) to execute the pipeline.
+
+Deploy `Tasks` and `Pipeline` using [deploy.sh](deploy.sh) if not already done:
+
+[deploy.sh](deploy.sh) need two environment variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` set to appropriate Docker credentials in plain text.
+
+```shell script
+./deploy.sh
+secret/dockerhub-user-pass created
+serviceaccount/openwhisk-app-builder created
+condition.tekton.dev/is-nodejs-runtime created
+condition.tekton.dev/is-java-runtime created
+condition.tekton.dev/is-python-runtime created
+persistentvolumeclaim/openwhisk-workspace created
+task.tekton.dev/clone-app-repo-to-workspace created
+task.tekton.dev/clone-runtime-repo-to-workspace created
+task.tekton.dev/task-install-npm-packages created
+task.tekton.dev/task-build-archive created
+task.tekton.dev/openwhisk created
+task.tekton.dev/task-install-pip-packages created
+task.tekton.dev/task-build-archive-python created
+task.tekton.dev/openwhisk-python created
+task.tekton.dev/create-jar-with-maven created
+task.tekton.dev/build-runtime-with-gradle created
+task.tekton.dev/build-shared-class-cache created
+task.tekton.dev/finalize-runtime-with-function created
+pipeline.tekton.dev/build-openwhisk-app created
+```
+
+Execute `PipelineRun` with:
+
+```shell script
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' pipelinerun/python/pipelinerun-python.yaml.tmpl > pipelinerun/python/pipelinerun-python.yaml
+kubectl apply -f pipelinerun/python/pipelinerun-python.yaml
+```
+
+Listing all the `Tasks`, `Pipeline`, and `PipelineRun`:
+
+```shell script
+tkn pr describe build-python-app-image
+Name:              build-python-app-image
+Namespace:         default
+Pipeline Ref:      build-openwhisk-app
+Service Account:   openwhisk-app-builder
+Timeout:           1h0m0s
+Labels:
+ tekton.dev/pipeline=build-openwhisk-app
+
+🌡️  Status
+
+STARTED      DURATION    STATUS
+1 hour ago   8 minutes   Succeeded(Completed)
+
+📦 Resources
+
+ NAME            RESOURCE REF
+ ∙ app-git
+ ∙ runtime-git
+ ∙ app-image
+
+⚓ Params
+
+ NAME               VALUE
+ ∙ OW_APP_PATH      packages/helloMorse/
+ ∙ DOCKERFILE       core/python3Action/Dockerfile
+ ∙ OW_ACTION_NAME   openwhisk-morse-hello-app
+
+🗂  Taskruns
+
+ NAME                                                       TASK NAME                          STARTED      DURATION     STATUS
+ ∙ build-app-image-clone-java-app-source-f62w4              clone-java-app-source              ---          ---          Failed(ConditionCheckFailed)
+ ∙ build-app-image-clone-nodejs-app-source-fsfqt            clone-nodejs-app-source            ---          ---          Failed(ConditionCheckFailed)
+ ∙ build-app-image-build-openwhisk-app-image-python-h4kgv   build-openwhisk-app-image-python   1 hour ago   7 minutes    Succeeded
+ ∙ build-app-image-build-archive-python-jwphl               build-archive-python               1 hour ago   11 seconds   Succeeded
+ ∙ build-app-image-clone-python-runtime-source-cjgjz        clone-python-runtime-source        1 hour ago   11 seconds   Succeeded
+ ∙ build-app-image-install-pip-packages-jvclf               install-pip-packages               1 hour ago   35 seconds   Succeeded
+ ∙ build-app-image-clone-python-app-source-x44p2            clone-python-app-source            1 hour ago   6 seconds    Succeeded
+```
+
+Create a new service on Knative with:
+
+```shell script
+sed -e 's/${DOCKER_USERNAME}/'"$DOCKER_USERNAME"'/' service/service-openwhisk-python-app.yaml.tmpl > service/service-openwhisk-python-app.yaml
+kubectl apply -f service/service-openwhisk-python-app.yaml
+```
+
+Run OpenWhisk NodeJS Application service:
+
+```shell script
+curl -H "Host: openwhisk-morse-hello-app.default.example.com" -d '@left-padding-data-run.json' -H "Content-Type: application/json" -X POST http://localhost/
+{"morseGreeting": ".... . .-.. .-.. --- --..--   .-- --- .-. .-.. -.. -.-.-- "}
 ```
