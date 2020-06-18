@@ -177,7 +177,6 @@ Follow these instructions to install the pipeline resources:
     ```
 
 2. Verify environment variables
-    </br>
 
     ```bash
     printenv DOCKER_USERNAME
@@ -186,7 +185,6 @@ Follow these instructions to install the pipeline resources:
 
 3. Run the deploy script
 
-    </br>
     Deploy all `Pipeline resources using the [deploy.sh](deploy.sh) script using the following command:</br>
 
     ```bash
