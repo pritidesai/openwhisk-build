@@ -313,7 +313,6 @@ The `PipelineRun` resource used to build a Python application is named `build-ja
     ```
 
     </details>
-    </br>
 
 3. Create a new service on Knative with:
 
@@ -418,7 +417,6 @@ The `PipelineRun` resource used to build a Python application is derived from th
     ```
 
     </details>
-    </br>
 
 3. Create a new service on Knative with:
 
@@ -524,7 +522,6 @@ The `PipelineRun` resource used to build a Java application is derived from the 
     ```
 
     </details>
-    </br>
 
 3. Create a new service on Knative with:
 
@@ -535,7 +532,7 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
 4. Run the application service with some different images:
 
-    </br>The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also base64 encoded the input images within JSON files that can be passed directly to the Java function as parameters.
+    The Java application converts color images to grayscale. We have provide a few sample images within this repo. for you to try as examples. In addition, we have also base64 encoded the input images within JSON files that can be passed directly to the Java function as parameters.
 
     </br>**Dice**</br>
 
@@ -553,22 +550,12 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
     ![02-conf-crowd.png](images/02-conf-crowd.png) => ![02-conf-crowd-gray.png](images/02-conf-crowd-gray.png)
 
-<!-->
-    </br>**EclipseCon**</br>
-
-    ```shell script
-    curl -H "Host: openwhisk-java-app.default.example.com" -d '{"value": {"png": "'$(base64 images/03-eclipsecon-2019.png | tr -d \\n)'"}}' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 03-eclipsecon-2019-gray.png
-    ```
-
-    ![03-eclipsecon-2019.png](images/03-eclipsecon-2019.png) => ![03-eclipsecon-2019-gray.png](images/03-eclipsecon-2019-gray.png)
--->
-
 #### Java pipeline vision
 
 It is the goal of this pipeline to provide further optimizations via additional tasks.
 
 The following diagram shows at a high level the envisioned tasks:
 
-![Java Pipeline](java-pipeline.jpg)
+![Java Pipeline](images/java-pipeline-vision.jpg)
 
 We welcome any Java developers who may wish to help us create and improve the tasks and their steps to help realize this vision!
