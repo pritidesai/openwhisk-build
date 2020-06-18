@@ -536,7 +536,7 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
     **Dice image example**
 
-    <br>Run the following curl command to convert the image:
+    Run the following curl command to convert the image:
 
     ```bash
     curl -H "Host: openwhisk-java-app.default.example.com" -d '@01-dice-color.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 01-dice-gray.png
@@ -548,7 +548,7 @@ The `PipelineRun` resource used to build a Java application is derived from the 
 
     **Dice image example**
 
-    <br>Run the following curl command to convert the image:
+    Run the following curl command to convert the image:
 
     ```bash
     curl -H "Host: openwhisk-java-app.default.example.com" -d '@02-conf-crowd.json' -H "Content-Type: application/json" -X POST http://localhost/run | jq -r '.body' | base64 -D > 02-conf-crowd-gray.png
