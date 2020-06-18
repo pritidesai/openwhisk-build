@@ -1,0 +1,46 @@
+##############################################
+# Artifacts created by OS/editors/IDEs
+##############################################
+
+# OS X
+**/.DS_Store
+
+# Go IDE
+*.iml
+.idea
+.project
+.settings
+.vscode
+Packages/
+
+# emacs
+*.elc
+*.rel
+.projectile
+.org-id-locations
+.dir-locals.el
+auto-save-list
+tramp
+
+##############################################
+# Artifacts from Knative/Istio installation
+##############################################
+/istio*
+istio-minimal-operator.yaml
+
+##############################################
+# Artifacts created by running samples
+##############################################
+docker-secret.yaml
+
+# Gradle
+.gradle
+build/
+bin/
+
+##############################################
+# Artifacts from examples
+##############################################
+pipelinerun/javascript/pipelinerun-javascript.yaml
+pipelinerun/java/pipelinerun-java.yaml
+pipelinerun/python/pipelinerun-python.yaml
