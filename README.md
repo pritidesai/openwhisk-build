@@ -193,7 +193,7 @@ Follow these instructions to install the pipeline resources:
 
     You should see all the pipeline resources were successfully created:
 
-    </br><details>
+    <details>
         <summary>Example results:</summary>
 
     ```bash
